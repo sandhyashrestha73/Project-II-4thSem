@@ -4,8 +4,61 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database import db
 from models.tourists import Tourist
 from models.agency import Agency
+from models.admin import Admin
 
 auth_bp = Blueprint("auth", __name__)
+
+
+
+
+@auth_bp.route("/api/auth/admin/login", methods=["POST"])
+def admin_login():
+
+    data = request.get_json()
+
+    if not data:
+        return {
+            "success": False,
+            "message": "No data provided"
+        }, 400
+
+    email = data.get("email")
+    password = data.get("password")
+
+    # Check required fields
+    if not email or not password:
+        return {
+            "success": False,
+            "message": "Email and password are required"
+        }, 400
+
+    # Find admin by email
+    admin = Admin.query.filter_by(email=email).first()
+
+    if not admin:
+        return {
+            "success": False,
+            "message": "Invalid email or password"
+        }, 401
+
+    # Check password
+    if not check_password_hash(admin.password, password):
+        return {
+            "success": False,
+            "message": "Invalid email or password"
+        }, 401
+
+    return {
+        "success": True,
+        "message": "Admin login successful",
+        "admin": {
+            "admin_id": admin.admin_id,
+            "username": admin.username,
+            "email": admin.email
+        }
+    }, 200
+
+
 
 
 @auth_bp.route("/api/auth/tourists/register", methods=["POST"])
