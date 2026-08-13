@@ -16,6 +16,8 @@ from models.gallery import Gallery
 from models.admin import Admin
 
 
+from routes.auth import auth_bp
+
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -23,6 +25,7 @@ app.config.from_object(Config)
 CORS(app)
 db.init_app(app)
 
+app.register_blueprint(auth_bp)
 
 
 @app.route("/")
