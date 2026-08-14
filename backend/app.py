@@ -17,6 +17,7 @@ from models.admin import Admin
 
 
 from routes.auth import auth_bp
+from routes.guide import guide_bp
 
 app = Flask(__name__)
 
@@ -26,6 +27,7 @@ CORS(app)
 db.init_app(app)
 
 app.register_blueprint(auth_bp)
+app.register_blueprint(guide_bp)
 
 
 @app.route("/")
