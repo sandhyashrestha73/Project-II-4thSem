@@ -18,6 +18,7 @@ from models.admin import Admin
 
 from routes.auth import auth_bp
 from routes.guide import guide_bp
+from routes.destination import destination_bp
 
 app = Flask(__name__)
 
@@ -28,6 +29,7 @@ db.init_app(app)
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(guide_bp)
+app.register_blueprint(destination_bp)
 
 
 @app.route("/")
