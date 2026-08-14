@@ -20,7 +20,9 @@ from routes.auth import auth_bp
 from routes.guide import guide_bp
 from routes.destination import destination_bp
 from routes.package import package_bp
-
+from routes.booking import booking_bp
+from routes.blog import blog_bp
+from routes.gallery import gallery_bp
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -32,6 +34,9 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(guide_bp)
 app.register_blueprint(destination_bp)
 app.register_blueprint(package_bp)
+app.register_blueprint(booking_bp)
+app.register_blueprint(blog_bp)
+app.register_blueprint(gallery_bp)
 
 @app.route("/")
 def home():
