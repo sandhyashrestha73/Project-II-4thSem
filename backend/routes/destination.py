@@ -2,11 +2,13 @@ from flask import Blueprint, request
 
 from database import db
 from models.destination import Destination
+from utils.authorization import role_required
 
 destination_bp = Blueprint("destination", __name__)
 
 
 @destination_bp.route("/api/destination", methods=["POST"])
+@role_required("admin")
 def create_destination():
 
     data = request.get_json()
@@ -101,6 +103,7 @@ def get_destination(destination_id):
 
 
 @destination_bp.route("/api/destination/<int:destination_id>", methods=["PUT"])
+@role_required("admin")
 def update_destination(destination_id):
 
     destination = Destination.query.get(destination_id)
@@ -148,6 +151,7 @@ def update_destination(destination_id):
 
 
 @destination_bp.route("/api/destination/<int:destination_id>", methods=["DELETE"])
+@role_required("admin")
 def delete_destination(destination_id):
 
     destination = Destination.query.get(destination_id)

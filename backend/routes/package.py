@@ -1,13 +1,17 @@
+
 from flask import Blueprint, request
+from flask_jwt_extended import get_jwt_identity, get_jwt
 
 from database import db
 from models.package import Package
+from utils.authorization import role_required
 
 package_bp = Blueprint("package", __name__)
 
 
 # CREATE PACKAGE
 @package_bp.route("/api/package", methods=["POST"])
+@role_required("agency")
 def create_package():
 
     data = request.get_json()
@@ -18,7 +22,9 @@ def create_package():
             "message": "No data provided"
         }, 400
 
-    agency_id = data.get("agency_id")
+    # Get agency ID from JWT instead of trusting request data
+    agency_id = int(get_jwt_identity())
+
     destination_id = data.get("destination_id")
     package_name = data.get("package_name")
     description = data.get("description")
@@ -26,10 +32,10 @@ def create_package():
     price = data.get("price")
     image = data.get("image")
 
-    if not agency_id or not destination_id or not package_name or not description or not duration or price is None:
+    if not destination_id or not package_name or not description or not duration or price is None:
         return {
             "success": False,
-            "message": "Agency ID, destination ID, package name, description, duration and price are required"
+            "message": "Destination ID, package name, description, duration and price are required"
         }, 400
 
     package = Package(
@@ -114,6 +120,7 @@ def get_package(package_id):
 
 # UPDATE PACKAGE
 @package_bp.route("/api/package/<int:package_id>", methods=["PUT"])
+@role_required("admin", "agency")
 def update_package(package_id):
 
     package = Package.query.get(package_id)
@@ -124,6 +131,18 @@ def update_package(package_id):
             "message": "Package not found"
         }, 404
 
+    # Get role and identity from JWT
+    claims = get_jwt()
+    role = claims.get("role")
+    user_id = int(get_jwt_identity())
+
+    # Agency can update only its own package
+    if role == "agency" and package.agency_id != user_id:
+        return {
+            "success": False,
+            "message": "Access denied"
+        }, 403
+
     data = request.get_json()
 
     if not data:
@@ -132,7 +151,9 @@ def update_package(package_id):
             "message": "No data provided"
         }, 400
 
-    if "agency_id" in data:
+    # Agency ID cannot be changed by agency
+    # Admin can change it if needed
+    if role == "admin" and "agency_id" in data:
         package.agency_id = data["agency_id"]
 
     if "destination_id" in data:
@@ -173,6 +194,7 @@ def update_package(package_id):
 
 # DELETE PACKAGE
 @package_bp.route("/api/package/<int:package_id>", methods=["DELETE"])
+@role_required("admin", "agency")
 def delete_package(package_id):
 
     package = Package.query.get(package_id)
@@ -183,6 +205,18 @@ def delete_package(package_id):
             "message": "Package not found"
         }, 404
 
+    # Get role and identity from JWT
+    claims = get_jwt()
+    role = claims.get("role")
+    user_id = int(get_jwt_identity())
+
+    # Agency can delete only its own package
+    if role == "agency" and package.agency_id != user_id:
+        return {
+            "success": False,
+            "message": "Access denied"
+        }, 403
+
     db.session.delete(package)
     db.session.commit()
 
@@ -190,3 +224,4 @@ def delete_package(package_id):
         "success": True,
         "message": "Package deleted successfully"
     }, 200
+

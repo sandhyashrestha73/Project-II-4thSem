@@ -2,12 +2,15 @@ from flask import Blueprint, request
 
 from database import db
 from models.blog import Blog
+from utils.authorization import role_required
+
 
 blog_bp = Blueprint("blog", __name__)
 
 
 # CREATE BLOG
 @blog_bp.route("/api/blog", methods=["POST"])
+@role_required("agency")
 def create_blog():
 
     data = request.get_json()
@@ -102,6 +105,7 @@ def get_blog(blog_id):
 
 # UPDATE BLOG
 @blog_bp.route("/api/blog/<int:blog_id>", methods=["PUT"])
+@role_required("admin", "agency")
 def update_blog(blog_id):
 
     blog = Blog.query.get(blog_id)
@@ -150,6 +154,7 @@ def update_blog(blog_id):
 
 # DELETE BLOG
 @blog_bp.route("/api/blog/<int:blog_id>", methods=["DELETE"])
+@role_required("admin", "agency")
 def delete_blog(blog_id):
 
     blog = Blog.query.get(blog_id)

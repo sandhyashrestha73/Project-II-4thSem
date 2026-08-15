@@ -2,12 +2,14 @@ from flask import Blueprint, request
 
 from database import db
 from models.gallery import Gallery
+from utils.authorization import role_required
 
 gallery_bp = Blueprint("gallery", __name__)
 
 
 # CREATE IMAGE
 @gallery_bp.route("/api/gallery", methods=["POST"])
+@role_required("agency")
 def create_gallery():
 
     data = request.get_json()
@@ -97,6 +99,7 @@ def get_gallery_image(image_id):
 
 # UPDATE IMAGE
 @gallery_bp.route("/api/gallery/<int:image_id>", methods=["PUT"])
+@role_required("admin", "agency")
 def update_gallery(image_id):
 
     gallery = Gallery.query.get(image_id)
@@ -141,6 +144,7 @@ def update_gallery(image_id):
 
 # DELETE IMAGE
 @gallery_bp.route("/api/gallery/<int:image_id>", methods=["DELETE"])
+@role_required("admin", "agency")
 def delete_gallery(image_id):
 
     gallery = Gallery.query.get(image_id)

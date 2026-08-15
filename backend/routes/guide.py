@@ -3,12 +3,13 @@ from flask import Blueprint, request
 from database import db
 from models.guide import Guide
 from models.agency import Agency
-
+from utils.authorization import role_required
 
 guide_bp = Blueprint("guide", __name__)
 
 
 @guide_bp.route("/api/guides", methods=["POST"])
+@role_required("agency")
 def create_guide():
 
     data = request.get_json()
@@ -127,6 +128,7 @@ def get_guide(guide_id):
 
 
 @guide_bp.route("/api/guides/<int:guide_id>", methods=["PUT"])
+@role_required("admin", "agency")
 def update_guide(guide_id):
 
     guide = Guide.query.get(guide_id)
@@ -183,6 +185,7 @@ def update_guide(guide_id):
 
 
 @guide_bp.route("/api/guides/<int:guide_id>", methods=["DELETE"])
+@role_required("admin", "agency")
 def delete_guide(guide_id):
 
     guide = Guide.query.get(guide_id)

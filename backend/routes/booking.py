@@ -2,12 +2,16 @@ from flask import Blueprint, request
 
 from database import db
 from models.booking import Booking
+from utils.authorization import role_required
+from flask_jwt_extended import get_jwt_identity
+
 
 booking_bp = Blueprint("booking", __name__)
 
 
 # CREATE BOOKING
 @booking_bp.route("/api/booking", methods=["POST"])
+@role_required("tourist")
 def create_booking():
 
     data = request.get_json()
@@ -79,6 +83,7 @@ def create_booking():
 
 # GET ALL BOOKINGS
 @booking_bp.route("/api/booking", methods=["GET"])
+@role_required("tourist", "agency", "admin")
 def get_bookings():
 
     bookings = Booking.query.all()
@@ -103,6 +108,7 @@ def get_bookings():
 
 # GET SINGLE BOOKING
 @booking_bp.route("/api/booking/<int:booking_id>", methods=["GET"])
+@role_required("tourist", "agency", "admin")
 def get_booking(booking_id):
 
     booking = Booking.query.get(booking_id)
@@ -130,6 +136,7 @@ def get_booking(booking_id):
 
 # UPDATE BOOKING
 @booking_bp.route("/api/booking/<int:booking_id>", methods=["PUT"])
+@role_required("tourist", "agency", "admin")
 def update_booking(booking_id):
 
     booking = Booking.query.get(booking_id)
@@ -205,6 +212,7 @@ def update_booking(booking_id):
 
 # DELETE BOOKING
 @booking_bp.route("/api/booking/<int:booking_id>", methods=["DELETE"])
+@role_required("admin")
 def delete_booking(booking_id):
 
     booking = Booking.query.get(booking_id)
@@ -221,4 +229,49 @@ def delete_booking(booking_id):
     return {
         "success": True,
         "message": "Booking deleted successfully"
+    }, 200
+
+
+
+@booking_bp.route("/api/booking/<int:booking_id>/cancel", methods=["PUT"])
+@role_required("tourist")
+def cancel_booking(booking_id):
+
+    booking = Booking.query.get(booking_id)
+
+    if not booking:
+        return {
+            "success": False,
+            "message": "Booking not found"
+        }, 404
+
+    # Get logged-in tourist ID from JWT
+    tourist_id = int(get_jwt_identity())
+
+    # Make sure the booking belongs to this tourist
+    if booking.tourist_id != tourist_id:
+        return {
+            "success": False,
+            "message": "Access denied"
+        }, 403
+
+    # Check current status
+    if booking.status == "Cancelled":
+        return {
+            "success": False,
+            "message": "Booking is already cancelled"
+        }, 400
+
+    # Cancel booking
+    booking.status = "Cancelled"
+
+    db.session.commit()
+
+    return {
+        "success": True,
+        "message": "Booking cancelled successfully",
+        "booking": {
+            "booking_id": booking.booking_id,
+            "status": booking.status
+        }
     }, 200
