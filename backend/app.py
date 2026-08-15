@@ -28,7 +28,7 @@ from routes.gallery import gallery_bp
 app = Flask(__name__)
 
 app.config.from_object(Config)
-JWTManager(app)
+jwt = JWTManager(app)
 
 
 CORS(app)

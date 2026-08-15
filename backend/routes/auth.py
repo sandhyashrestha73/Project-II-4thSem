@@ -33,6 +33,8 @@ def admin_login():
             "message": "Email and password are required"
         }, 400
 
+    
+    
     # Find admin by email
     admin = Admin.query.filter_by(email=email).first()
 
@@ -49,16 +51,23 @@ def admin_login():
             "message": "Invalid email or password"
         }, 401
 
+
+    access_token = create_access_token(
+             identity=str(admin.admin_id),
+             additional_claims={"role": "admin"}
+            )
+    
+        
     return {
         "success": True,
         "message": "Admin login successful",
+        "access_token": access_token,
         "admin": {
             "admin_id": admin.admin_id,
             "username": admin.username,
             "email": admin.email
         }
     }, 200
-
 
 
 
@@ -160,9 +169,16 @@ def tourist_login():
             "message": "Invalid email or password"
         }, 401
 
+    
+    access_token = create_access_token(
+        identity=str(tourist.tourist_id),
+        additional_claims={"role": "tourist"}
+     )
+    
     return {
         "success": True,
         "message": "Login successful",
+         "access_token": access_token,
         "tourist": {
             "tourist_id": tourist.tourist_id,
             "full_name": tourist.full_name,
@@ -295,9 +311,17 @@ def agency_login():
             "message": "Invalid email or password"
         }, 401
 
+    
+    access_token = create_access_token(
+        identity=str(agency.agency_id),
+        additional_claims={"role": "agency"}
+    )
+
+
     return {
         "success": True,
         "message": "Agency login successful",
+        "access_token": access_token,
         "agency": {
             "agency_id": agency.agency_id,
             "agency_name": agency.agency_name,
