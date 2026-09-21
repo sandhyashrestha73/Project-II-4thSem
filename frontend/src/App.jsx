@@ -6,6 +6,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Destinations from "./pages/Destinations";
 import DestinationDetail from "./pages/DestinationDetail";
 import Packages from "./pages/Packages";
@@ -47,6 +49,8 @@ export default function App() {
       <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
       <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
       <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
+      <Route path="/forgot-password" element={<PublicLayout><ForgotPassword /></PublicLayout>}/>
+      <Route path="/reset-password" element={<PublicLayout><ResetPassword /></PublicLayout>}/>
       <Route path="/destinations" element={<PublicLayout><Destinations /></PublicLayout>} />
       <Route path="/destinations/:id" element={<PublicLayout><DestinationDetail /></PublicLayout>} />
       <Route path="/packages" element={<PublicLayout><Packages /></PublicLayout>} />

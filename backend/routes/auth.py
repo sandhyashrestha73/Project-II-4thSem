@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from flask_jwt_extended import create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 from database import db
 from models.tourists import Tourist
@@ -191,6 +192,18 @@ def tourist_login():
 
 
 
+# Used for password reset tokens
+RESET_TOKEN_MAX_AGE = 15 * 60  # 15 minutes
+
+
+def get_reset_serializer():
+    from flask import current_app
+
+    return URLSafeTimedSerializer(
+        current_app.config["SECRET_KEY"]
+    )
+
+
 
 @auth_bp.route("/api/auth/agency/register", methods=["POST"])
 def agency_register():
@@ -332,4 +345,78 @@ def agency_login():
             "license_no": agency.license_no,
             "verified": agency.verified
         }
+    }, 200
+
+
+
+
+
+@auth_bp.route("/api/auth/forgot-password", methods=["POST"])
+def forgot_password():
+
+    data = request.get_json()
+
+    if not data:
+        return {
+            "success": False,
+            "message": "No data provided"
+        }, 400
+
+    email = data.get("email")
+    role = data.get("role")
+
+    if not email or not role:
+        return {
+            "success": False,
+            "message": "Email and account type are required"
+        }, 400
+
+    role = role.lower().strip()
+
+    # Find account according to role
+    if role == "tourist":
+        user = Tourist.query.filter_by(email=email).first()
+
+    elif role == "agency":
+        user = Agency.query.filter_by(email=email).first()
+
+    elif role == "admin":
+        user = Admin.query.filter_by(email=email).first()
+
+    else:
+        return {
+            "success": False,
+            "message": "Invalid account type"
+        }, 400
+
+    # Do not reveal whether email exists
+    if not user:
+        return {
+            "success": True,
+            "message": "If the account exists, a password reset link has been generated."
+        }, 200
+
+    # Create secure reset token
+    serializer = get_reset_serializer()
+
+    token_data = {
+        "email": email,
+        "role": role
+    }
+
+    token = serializer.dumps(token_data, salt="password-reset")
+
+    # Frontend reset URL
+    reset_link = f"http://localhost:5173/reset-password?token={token}"
+
+    # For development/testing
+    print("\n========================================")
+    print("PASSWORD RESET LINK")
+    print(reset_link)
+    print("========================================\n")
+
+    return {
+        "success": True,
+        "message": "Password reset link generated successfully.",
+        "reset_link": reset_link
     }, 200
