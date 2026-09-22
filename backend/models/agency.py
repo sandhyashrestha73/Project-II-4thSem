@@ -13,6 +13,7 @@ class Agency(db.Model):
     description = db.Column(db.Text)
     license_no = db.Column(db.String(100), nullable=False, unique=True)
     verified = db.Column(db.Boolean, nullable=False, default=False)
+    status = db.Column( db.String(20),nullable=False,default="Pending")
     created_at = db.Column(
         db.DateTime,
         server_default=db.func.current_timestamp()

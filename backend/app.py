@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask , send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
@@ -19,6 +19,7 @@ from models.gallery import Gallery
 from models.admin import Admin
 
 
+from routes.admin import admin_bp
 from routes.auth import auth_bp
 from routes.guide import guide_bp
 from routes.destination import destination_bp
@@ -36,6 +37,7 @@ mail = Mail(app)
 CORS(app)
 db.init_app(app)
 
+app.register_blueprint(admin_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(guide_bp)
 app.register_blueprint(destination_bp)
@@ -48,6 +50,12 @@ app.register_blueprint(gallery_bp)
 def home():
     return "Welcome to TourEase Nepal"
     
+
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename):
+    return send_from_directory("uploads", filename)
+
+
 
 @app.route("/api/test-db")
 def test_db():

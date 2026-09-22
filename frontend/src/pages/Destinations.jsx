@@ -4,6 +4,8 @@ import { getDestinations } from "../services/destinationService";
 import Loader from "../components/Loader";
 import ErrorMessage, { extractErrorMessage } from "../components/ErrorMessage";
 
+
+
 export default function Destinations() {
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,11 +16,15 @@ export default function Destinations() {
     setLoading(true);
     setError("");
     getDestinations()
-      .then(setDestinations)
-      .catch((err) => setError(extractErrorMessage(err, "Could not load destinations.")))
-      .finally(() => setLoading(false));
-  }
-
+      .then((data) => {
+      console.log("DESTINATIONS FROM BACKEND:", data);
+      setDestinations(data);
+    })
+    .catch((err) =>
+      setError(extractErrorMessage(err, "Could not load destinations."))
+    )
+    .finally(() => setLoading(false));
+}
   useEffect(load, []);
 
   const filtered = destinations.filter((d) => {
