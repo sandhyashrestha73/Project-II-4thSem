@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { adminNavItems } from "./AdminDashboard";
 import Loader from "../../components/Loader";
+import { getImageUrl } from "../../utils/imageUrl";
 import ErrorMessage, {
   extractErrorMessage,
 } from "../../components/ErrorMessage";
@@ -201,7 +202,7 @@ export default function AdminDestinations() {
                   <div className="h-32 w-full bg-base-surface">
                     {d.image ? (
                       <img
-                        src={d.image}
+                        src={getImageUrl(d.image)}
                         alt={d.name}
                         className="h-full w-full object-cover"
                       />

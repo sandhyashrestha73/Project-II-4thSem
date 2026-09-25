@@ -1,21 +1,21 @@
 import api from "../api/axios";
 
-// Maps exactly to routes/package.py
-
+// Get all packages
 export const getPackages = () =>
   api.get("/api/package").then((res) => res.data.packages);
 
+// Get single package
 export const getPackage = (id) =>
   api.get(`/api/package/${id}`).then((res) => res.data.package);
 
-// agency only - agency_id is taken from the JWT by the backend, do not send it
-export const createPackage = (payload) =>
-  api.post("/api/package", payload).then((res) => res.data);
+// Create package with FormData
+export const createPackage = (formData) =>
+  api.post("/api/package", formData).then((res) => res.data);
 
-// admin, or the owning agency
-export const updatePackage = (id, payload) =>
-  api.put(`/api/package/${id}`, payload).then((res) => res.data);
+// Update package with FormData
+export const updatePackage = (id, formData) =>
+  api.put(`/api/package/${id}`, formData).then((res) => res.data);
 
-// admin, or the owning agency
+// Delete package
 export const deletePackage = (id) =>
   api.delete(`/api/package/${id}`).then((res) => res.data);

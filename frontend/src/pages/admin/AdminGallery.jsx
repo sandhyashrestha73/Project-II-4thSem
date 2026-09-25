@@ -4,6 +4,7 @@ import { adminNavItems } from "./AdminDashboard";
 import Loader from "../../components/Loader";
 import ErrorMessage, { extractErrorMessage } from "../../components/ErrorMessage";
 import { getGallery, deleteGalleryImage } from "../../services/galleryService";
+import { getImageUrl } from "../../utils/imageUrl";
 
 export default function AdminGallery() {
   const [images, setImages] = useState([]);
@@ -46,7 +47,7 @@ export default function AdminGallery() {
             {images.map((img) => (
               <div key={img.image_id} className="card overflow-hidden">
                 <div className="h-32 w-full bg-base-surface">
-                  <img src={img.image} alt={img.title} className="h-full w-full object-cover" />
+                  <img src={getImageUrl(img.image)} alt={img.title} className="h-full w-full object-cover" />
                 </div>
                 <div className="p-3">
                   <p className="truncate text-sm text-white">{img.title}</p>

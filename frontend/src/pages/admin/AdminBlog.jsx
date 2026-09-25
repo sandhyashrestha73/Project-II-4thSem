@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { adminNavItems } from "./AdminDashboard";
 import Loader from "../../components/Loader";
+import { getImageUrl } from "../../utils/imageUrl";
 import ErrorMessage, { extractErrorMessage } from "../../components/ErrorMessage";
 import { getBlogs, deleteBlog } from "../../services/blogService";
 
@@ -51,7 +52,7 @@ export default function AdminBlog() {
               <div key={b.blog_id} className="card overflow-hidden">
                 <div className="h-32 w-full bg-base-surface">
                   {b.image ? (
-                    <img src={b.image} alt={b.title} className="h-full w-full object-cover" />
+                    <img src={getImageUrl(b.image)}alt={b.title} className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full items-center justify-center text-slate-600">No image</div>
                   )}
