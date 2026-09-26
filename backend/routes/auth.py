@@ -468,14 +468,14 @@ def admin_login():
     if not admin:
         return {
             "success": False,
-            "message": "Invalid email or password"
+            "message": "Invalid email"
         }, 401
 
     # Check password
     if not check_password_hash(admin.password, password):
         return {
             "success": False,
-            "message": "Invalid email or password"
+            "message": "Invalid password"
         }, 401
 
     access_token = create_access_token(
@@ -581,14 +581,14 @@ def tourist_login():
     if not tourist:
         return {
             "success": False,
-            "message": "Invalid email or password"
+            "message": "Invalid email"
         }, 401
 
     # Check password
     if not check_password_hash(tourist.password, password):
         return {
             "success": False,
-            "message": "Invalid email or password"
+            "message": "Invalid password"
         }, 401
 
     access_token = create_access_token(
@@ -728,14 +728,14 @@ def agency_login():
     if not agency:
         return {
             "success": False,
-            "message": "Invalid email or password"
+            "message": "Invalid email"
         }, 401
 
     # Check password
     if not check_password_hash(agency.password, password):
         return {
             "success": False,
-            "message": "Invalid email or password"
+            "message": "Invalid password"
         }, 401
 
     # NEW: Check admin verification

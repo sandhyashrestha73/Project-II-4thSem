@@ -41,8 +41,9 @@ export default function Navbar() {
           <img
             src={logoImg}
             alt="TourEase Nepal"
-            className="h-11 w-auto object-contain"
+            className="h-11 w-auto object-contain rounded"
           />
+        
         </NavLink>
 
         {/* Desktop Navigation */}
