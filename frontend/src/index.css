@@ -321,3 +321,23 @@ body {
       text-accent;
   }
 }
+
+
+
+@keyframes heroZoom {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.010);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.hero-background {
+  animation: heroZoom 40s ease-in-out infinite;
+}

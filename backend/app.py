@@ -17,6 +17,7 @@ from models.booking import Booking
 from models.blog import Blog
 from models.gallery import Gallery
 from models.admin import Admin
+from models.contact_message import ContactMessage
 
 
 from routes.admin import admin_bp
@@ -27,6 +28,9 @@ from routes.package import package_bp
 from routes.booking import booking_bp
 from routes.blog import blog_bp
 from routes.gallery import gallery_bp
+from routes.contact import contact_bp
+from routes.agency import agency_bp
+
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -45,6 +49,8 @@ app.register_blueprint(package_bp)
 app.register_blueprint(booking_bp)
 app.register_blueprint(blog_bp)
 app.register_blueprint(gallery_bp)
+app.register_blueprint(contact_bp)
+app.register_blueprint(agency_bp)
 
 @app.route("/")
 def home():

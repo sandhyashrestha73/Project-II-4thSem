@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
@@ -17,6 +18,8 @@ import {
   approveAgency,
   rejectAgency,
 } from "../../services/agencyService";
+
+import { getContactMessages } from "../../services/contactService";
 
 
 // ======================================================
@@ -74,6 +77,15 @@ export default function AdminDashboard() {
   const [agencies, setAgencies] = useState([]);
   const [agencyLoading, setAgencyLoading] = useState(false);
   const [agencyError, setAgencyError] = useState("");
+
+
+  // ----------------------------------------------------
+  // CONTACT MESSAGE STATE
+  // ----------------------------------------------------
+
+  const [contactMessages, setContactMessages] = useState([]);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactError, setContactError] = useState("");
 
 
   // ====================================================
@@ -139,12 +151,39 @@ export default function AdminDashboard() {
 
 
   // ====================================================
+  // LOAD CONTACT MESSAGES
+  // ====================================================
+
+  function loadContactMessages() {
+    setContactLoading(true);
+    setContactError("");
+
+    getContactMessages()
+      .then((data) => {
+        setContactMessages(data || []);
+      })
+      .catch((err) => {
+        setContactError(
+          extractErrorMessage(
+            err,
+            "Could not load contact messages."
+          )
+        );
+      })
+      .finally(() => {
+        setContactLoading(false);
+      });
+  }
+
+
+  // ====================================================
   // LOAD DATA WHEN PAGE OPENS
   // ====================================================
 
   useEffect(() => {
     load();
     loadPendingAgencies();
+    loadContactMessages();
   }, []);
 
 
@@ -450,10 +489,162 @@ export default function AdminDashboard() {
 
           </div>
 
-        </>
 
+          {/* ==================================================
+              CONTACT MESSAGES
+          ================================================== */}
+
+          <div className="card mt-10 p-6">
+
+            {/* ------------------------------------------------
+                SECTION HEADER
+            ------------------------------------------------ */}
+
+            <div className="flex items-center justify-between">
+
+              <div>
+
+                <h2 className="text-lg font-semibold text-white">
+                  Contact Messages
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-400">
+                  Messages received through the contact form.
+                </p>
+
+              </div>
+
+              {/* Message Count */}
+
+              <span className="rounded-full bg-yellow-500/10 px-3 py-1 text-sm font-medium text-yellow-400">
+                {contactMessages.length} Messages
+              </span>
+
+            </div>
+
+
+            {/* ==================================================
+                CONTACT LOADING
+            ================================================== */}
+
+            {contactLoading && (
+              <div className="mt-6">
+                <Loader label="Loading contact messages..." />
+              </div>
+            )}
+
+
+            {/* ==================================================
+                CONTACT ERROR
+            ================================================== */}
+
+            {!contactLoading && contactError && (
+              <div className="mt-6">
+                <ErrorMessage
+                  message={contactError}
+                  onRetry={loadContactMessages}
+                />
+              </div>
+            )}
+
+
+            {/* ==================================================
+                NO MESSAGES
+            ================================================== */}
+
+            {!contactLoading &&
+              !contactError &&
+              contactMessages.length === 0 && (
+                <div className="mt-6 rounded-lg border border-slate-700 p-6 text-center">
+
+                  <p className="font-medium text-slate-300">
+                    No contact messages
+                  </p>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Messages submitted through the contact form
+                    will appear here.
+                  </p>
+
+                </div>
+              )}
+
+
+            {/* ==================================================
+                CONTACT MESSAGE LIST
+            ================================================== */}
+
+            {!contactLoading &&
+              !contactError &&
+              contactMessages.length > 0 && (
+
+                <div className="mt-6 space-y-4">
+
+                  {contactMessages.map((item) => (
+
+                    <div
+                      key={item.message_id}
+                      className="rounded-xl border border-slate-700 bg-slate-900/50 p-5"
+                    >
+
+                      {/* MESSAGE HEADER */}
+
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+                        <div>
+
+                          <h3 className="text-base font-semibold text-white">
+                            {item.subject}
+                          </h3>
+
+                          <p className="mt-1 text-sm text-slate-400">
+                            From: {item.name}
+                          </p>
+
+                          <p className="text-sm text-slate-400">
+                            Email: {item.email}
+                          </p>
+
+                        </div>
+
+
+                        {/* DATE */}
+
+                        <p className="text-xs text-slate-500">
+                          {item.created_at
+                            ? new Date(
+                                item.created_at
+                              ).toLocaleString()
+                            : ""}
+                        </p>
+
+                      </div>
+
+
+                      {/* MESSAGE */}
+
+                      <div className="mt-4 rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+
+                        <p className="whitespace-pre-wrap text-sm leading-6 text-slate-300">
+                          {item.message}
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  ))}
+
+                </div>
+
+              )}
+
+          </div>
+
+        </>
       )}
 
     </DashboardLayout>
   );
 }
+

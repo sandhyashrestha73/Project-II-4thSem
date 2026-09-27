@@ -3,17 +3,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { extractErrorMessage } from "../components/ErrorMessage";
 
-const roles = [
-  { key: "tourist", label: "Traveler" },
-  { key: "agency", label: "Agency" },
-];
-
-export default function Login() {
+export default function AdminLogin() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [role, setRole] = useState("tourist");
 
   const [form, setForm] = useState({
     email: "",
@@ -25,23 +18,10 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false);
 
   function update(field, value) {
-    setForm((f) => ({
-      ...f,
+    setForm((current) => ({
+      ...current,
       [field]: value,
     }));
-  }
-
-  // Change role and clear previous login information
-  function changeRole(newRole) {
-    setRole(newRole);
-
-    setForm({
-      email: "",
-      password: "",
-    });
-
-    setShowPassword(false);
-    setError("");
   }
 
   async function handleSubmit(e) {
@@ -52,16 +32,14 @@ export default function Login() {
 
     try {
       const sessionUser = await login(
-        role,
+        "admin",
         form.email,
         form.password
       );
 
       const redirectTo =
         location.state?.from?.pathname ||
-        (sessionUser.role === "agency"
-          ? "/agency/dashboard"
-          : "/");
+        "/admin/dashboard";
 
       navigate(redirectTo, {
         replace: true,
@@ -70,7 +48,7 @@ export default function Login() {
       setError(
         extractErrorMessage(
           err,
-          "Invalid email or password."
+          "Invalid admin email or password."
         )
       );
     } finally {
@@ -79,57 +57,41 @@ export default function Login() {
   }
 
   return (
-    <div className="grid min-h-[calc(100vh-72px)] md:grid-cols-2">
+    <div className="flex min-h-screen items-center justify-center bg-base-bg px-4 py-12">
 
-      {/* Left Section */}
-      <div className="hidden bg-gradient-to-br from-base-surface via-base-card to-base-bg md:flex md:items-center md:justify-center">
-        <div className="max-w-sm px-10 text-center">
+      <div className="w-full max-w-md">
+
+        {/* Logo / Brand */}
+        <div className="mb-8 text-center">
 
           <p className="text-3xl font-extrabold text-white">
             Tour<span className="text-accent">Ease</span> Nepal
           </p>
 
-          <p className="mt-4 text-slate-400">
-            Sign in to book packages and manage your
-            agency listings.
+          <p className="mt-3 text-sm text-slate-400">
+            Administration Portal
           </p>
 
         </div>
-      </div>
 
-      {/* Right Section */}
-      <div className="flex items-center justify-center px-4 py-16 md:px-10">
-        <div className="w-full max-w-md">
+        {/* Admin Login Card */}
+        <div className="card p-6 md:p-8">
 
-          <p className="text-2xl font-bold text-white">
-            Log in
-          </p>
+          <div className="text-center">
 
-          <p className="mt-1 text-slate-400">
-            Welcome back
-          </p>
+            <h1 className="text-2xl font-bold text-white">
+              Admin Login
+            </h1>
 
-          {/* Role Selection */}
-          <div className="mt-6 grid grid-cols-2 gap-2">
-            {roles.map((r) => (
-              <button
-                key={r.key}
-                type="button"
-                onClick={() => changeRole(r.key)}
-                className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-                  role === r.key
-                    ? "bg-accent text-base-bg"
-                    : "border border-base-border bg-base-surface text-slate-300 hover:border-accent/50"
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
+            <p className="mt-2 text-sm text-slate-400">
+              Sign in to access the TourEase administration portal.
+            </p>
+
           </div>
 
           {/* Error */}
           {error && (
-            <p className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+            <p className="mt-6 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
               {error}
             </p>
           )}
@@ -137,27 +99,27 @@ export default function Login() {
           {/* Login Form */}
           <form
             onSubmit={handleSubmit}
-            className="mt-6 space-y-4"
+            className="mt-6 space-y-5"
             autoComplete="off"
           >
 
             {/* Email */}
             <div>
               <label className="mb-1.5 block text-sm text-slate-300">
-                Email
+                Admin Email
               </label>
 
               <input
                 type="email"
                 required
-                name={`login-email-${role}`}
+                name="admin-login-email"
                 autoComplete="off"
                 className="input-field"
                 value={form.email}
                 onChange={(e) =>
                   update("email", e.target.value)
                 }
-                placeholder="Enter your email"
+                placeholder="Enter admin email"
               />
             </div>
 
@@ -168,17 +130,18 @@ export default function Login() {
               </label>
 
               <div className="relative">
+
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  name={`login-password-${role}`}
+                  name="admin-login-password"
                   autoComplete="new-password"
                   className="input-field pr-12"
                   value={form.password}
                   onChange={(e) =>
                     update("password", e.target.value)
                   }
-                  placeholder="Enter your password"
+                  placeholder="Enter admin password"
                 />
 
                 <button
@@ -195,17 +158,20 @@ export default function Login() {
                 >
                   {showPassword ? "🙈" : "👁️"}
                 </button>
+
               </div>
             </div>
 
             {/* Forgot Password */}
             <div className="flex justify-end">
+
               <Link
-                to={`/forgot-password?role=${role}`}
+                to="/forgot-password?role=admin"
                 className="text-sm font-medium text-accent hover:underline"
               >
                 Forgot password?
               </Link>
+
             </div>
 
             {/* Login Button */}
@@ -216,23 +182,18 @@ export default function Login() {
             >
               {submitting
                 ? "Logging in..."
-                : "Log in"}
+                : "Admin Login"}
             </button>
 
           </form>
 
-          {/* Register */}
-          <p className="mt-6 text-sm text-slate-400">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="font-semibold text-accent hover:underline"
-            >
-              Sign Up
-            </Link>
-          </p>
-
         </div>
+
+        {/* Small note */}
+        <p className="mt-5 text-center text-xs text-slate-500">
+          This portal is restricted to authorized TourEase administrators.
+        </p>
+
       </div>
 
     </div>

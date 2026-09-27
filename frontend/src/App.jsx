@@ -1,10 +1,12 @@
 import { Routes, Route } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import AdminLogin from "./pages/AdminLogin";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -17,6 +19,11 @@ import BlogDetail from "./pages/BlogDetail";
 import Gallery from "./pages/Gallery";
 import MyBookings from "./pages/MyBookings";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+
 
 import AgencyDashboard from "./pages/agency/AgencyDashboard";
 import AgencyPackages from "./pages/agency/AgencyPackages";
@@ -24,6 +31,8 @@ import AgencyGuides from "./pages/agency/AgencyGuides";
 import AgencyBookings from "./pages/agency/AgencyBookings";
 import AgencyBlog from "./pages/agency/AgencyBlog";
 import AgencyGallery from "./pages/agency/AgencyGallery";
+import AgencyProfile from "./pages/AgencyProfile";
+import Agencies from "./pages/Agencies";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDestinations from "./pages/admin/AdminDestinations";
@@ -36,7 +45,11 @@ function PublicLayout({ children }) {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <div className="flex-1">{children}</div>
+
+      <div className="flex-1">
+        {children}
+      </div>
+
       <Footer />
     </div>
   );
@@ -45,19 +58,183 @@ function PublicLayout({ children }) {
 export default function App() {
   return (
     <Routes>
-      {/* Public site */}
-      <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
-      <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
-      <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
-      <Route path="/forgot-password" element={<PublicLayout><ForgotPassword /></PublicLayout>}/>
-      <Route path="/reset-password" element={<PublicLayout><ResetPassword /></PublicLayout>}/>
-      <Route path="/destinations" element={<PublicLayout><Destinations /></PublicLayout>} />
-      <Route path="/destinations/:id" element={<PublicLayout><DestinationDetail /></PublicLayout>} />
-      <Route path="/packages" element={<PublicLayout><Packages /></PublicLayout>} />
-      <Route path="/packages/:id" element={<PublicLayout><PackageDetail /></PublicLayout>} />
-      <Route path="/blog" element={<PublicLayout><Blog /></PublicLayout>} />
-      <Route path="/blog/:id" element={<PublicLayout><BlogDetail /></PublicLayout>} />
-      <Route path="/gallery" element={<PublicLayout><Gallery /></PublicLayout>} />
+
+      {/* =====================================================
+          PUBLIC SITE
+      ===================================================== */}
+
+      <Route
+        path="/"
+        element={
+          <PublicLayout>
+            <Home />
+          </PublicLayout>
+        }
+      />
+
+      {/* Normal login - Tourist + Agency only */}
+      <Route
+        path="/login"
+        element={
+          <PublicLayout>
+            <Login />
+          </PublicLayout>
+        }
+      />
+
+      {/* Separate admin login */}
+      <Route
+        path="/admin_login"
+        element={<AdminLogin />}
+      />
+
+      <Route
+        path="/register"
+        element={
+          <PublicLayout>
+            <Register />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/forgot-password"
+        element={
+          <PublicLayout>
+            <ForgotPassword />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/reset-password"
+        element={
+          <PublicLayout>
+            <ResetPassword />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/destinations"
+        element={
+          <PublicLayout>
+            <Destinations />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/destinations/:id"
+        element={
+          <PublicLayout>
+            <DestinationDetail />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/packages"
+        element={
+          <PublicLayout>
+            <Packages />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/packages/:id"
+        element={
+          <PublicLayout>
+            <PackageDetail />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/blog"
+        element={
+          <PublicLayout>
+            <Blog />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/blog/:id"
+        element={
+          <PublicLayout>
+            <BlogDetail />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/gallery"
+        element={
+          <PublicLayout>
+            <Gallery />
+          </PublicLayout>
+        }
+      />
+
+        <Route 
+          path="/about" 
+          element={
+      <PublicLayout>
+        <About />
+      </PublicLayout>
+    } 
+  />
+
+    <Route 
+      path="/contact" 
+      element={
+    <PublicLayout>
+      <Contact />
+    </PublicLayout>
+  } 
+/>
+
+    <Route 
+      path="/privacy-policy" 
+      element={
+    <PublicLayout>
+      <PrivacyPolicy />
+    </PublicLayout>
+  } 
+/>
+  <Route
+  path="/agencies/:agency_id"
+  element={
+    <PublicLayout>
+      <AgencyProfile />
+    </PublicLayout>
+  }
+/>
+
+
+  <Route
+  path="/agencies"
+  element={
+    <PublicLayout>
+      <Agencies />
+    </PublicLayout>
+  }
+/>
+    <Route 
+      path="/terms" 
+      element={
+    <PublicLayout>
+      <Terms />
+    </PublicLayout>
+  } 
+/>
+
+
+      {/* =====================================================
+          TOURIST PORTAL
+      ===================================================== */}
 
       <Route
         path="/my-bookings"
@@ -70,7 +247,10 @@ export default function App() {
         }
       />
 
-      {/* Agency portal */}
+      {/* =====================================================
+          AGENCY PORTAL
+      ===================================================== */}
+
       <Route
         path="/agency/dashboard"
         element={
@@ -79,6 +259,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/agency/packages"
         element={
@@ -87,6 +268,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/agency/guides"
         element={
@@ -95,6 +277,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/agency/bookings"
         element={
@@ -103,6 +286,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/agency/blog"
         element={
@@ -111,6 +295,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/agency/gallery"
         element={
@@ -120,7 +305,10 @@ export default function App() {
         }
       />
 
-      {/* Admin portal */}
+      {/* =====================================================
+          ADMIN PORTAL
+      ===================================================== */}
+
       <Route
         path="/admin/dashboard"
         element={
@@ -129,6 +317,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/admin/destinations"
         element={
@@ -137,6 +326,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/admin/packages"
         element={
@@ -145,6 +335,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/admin/bookings"
         element={
@@ -153,6 +344,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/admin/blog"
         element={
@@ -161,6 +353,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/admin/gallery"
         element={
@@ -170,7 +363,19 @@ export default function App() {
         }
       />
 
-      <Route path="*" element={<PublicLayout><NotFound /></PublicLayout>} />
+      {/* =====================================================
+          404
+      ===================================================== */}
+
+      <Route
+        path="*"
+        element={
+          <PublicLayout>
+            <NotFound />
+          </PublicLayout>
+        }
+      />
+
     </Routes>
   );
 }

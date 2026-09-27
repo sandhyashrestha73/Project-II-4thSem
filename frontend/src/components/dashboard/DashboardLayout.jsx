@@ -5,11 +5,30 @@ export default function DashboardLayout({ portalLabel, navItems, children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  function handleLogout() {
+  /*function handleLogout() {
+     
     logout();
     navigate("/");
   }
 
+
+  function handleLogout() {
+  navigate("/", { replace: true });
+
+  setTimeout(() => {
+    logout();
+  }, 0);
+}
+
+*/
+
+
+function handleLogout() {
+  localStorage.removeItem("tourease_token");
+  localStorage.removeItem("tourease_user");
+
+  window.location.replace("/");
+}
   return (
     <div className="flex min-h-[calc(100vh-1px)] flex-col md:flex-row">
       <aside className="w-full shrink-0 border-b border-base-border bg-base-surface md:w-64 md:border-b-0 md:border-r">

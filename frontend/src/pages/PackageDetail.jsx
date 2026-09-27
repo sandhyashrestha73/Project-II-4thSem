@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getPackage } from "../services/packageService";
@@ -171,78 +172,111 @@ export default function PackageDetail() {
             <span className="text-text-subtle">/ person</span>
           </p>
 
-          {bookingError && (
-            <p className="mt-4 rounded-lg border border-danger/30 bg-red-50 px-3 py-2 text-sm text-danger">
-              {bookingError}
-            </p>
-          )}
+          {/* Guest User */}
+          {!user && (
+            <div className="mt-5">
+              <p className="text-sm leading-6 text-text-muted">
+                Please log in as a tourist to book this package.
+              </p>
 
-          {bookingSuccess && (
-            <p className="mt-4 rounded-lg border border-success/30 bg-green-50 px-3 py-2 text-sm text-success">
-              {bookingSuccess}{" "}
-              <Link to="/my-bookings" className="underline">
-                View bookings
+              <Link
+                to="/login"
+                state={{
+                  from: {
+                    pathname: `/packages/${id}`,
+                  },
+                }}
+                className="btn-primary mt-5 block w-full text-center"
+              >
+                Log in to Book
               </Link>
-            </p>
+            </div>
           )}
 
-          <form
-            onSubmit={handleBooking}
-            className="mt-5 space-y-4"
-          >
-            <div>
-              <label className="mb-1.5 block text-sm text-text-muted">
-                Travel Date
-              </label>
-
-              <input
-                type="date"
-                required
-                min={new Date().toISOString().split("T")[0]}
-                className="input-field"
-                value={travelDate}
-                onChange={(e) => setTravelDate(e.target.value)}
-              />
+          {/* Agency / Admin */}
+          {user && role !== "tourist" && (
+            <div className="mt-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-4">
+              <p className="text-sm leading-6 text-amber-700">
+                Only tourist accounts can make bookings.
+              </p>
             </div>
+          )}
 
-            <div>
-              <label className="mb-1.5 block text-sm text-text-muted">
-                Persons
-              </label>
+          {/* Tourist Booking Form */}
+          {user && role === "tourist" && (
+            <>
+              {bookingError && (
+                <p className="mt-4 rounded-lg border border-danger/30 bg-red-50 px-3 py-2 text-sm text-danger">
+                  {bookingError}
+                </p>
+              )}
 
-              <input
-                type="number"
-                min={1}
-                required
-                className="input-field"
-                value={persons}
-                onChange={(e) => setPersons(e.target.value)}
-              />
-            </div>
+              {bookingSuccess && (
+                <p className="mt-4 rounded-lg border border-success/30 bg-green-50 px-3 py-2 text-sm text-success">
+                  {bookingSuccess}{" "}
+                  <Link to="/my-bookings" className="underline">
+                    View bookings
+                  </Link>
+                </p>
+              )}
 
-            <div className="flex items-center justify-between border-t border-base-border pt-4 text-sm">
-              <span className="text-text-muted">Total</span>
+              <form
+                onSubmit={handleBooking}
+                className="mt-5 space-y-4"
+              >
+                <div>
+                  <label className="mb-1.5 block text-sm text-text-muted">
+                    Travel Date
+                  </label>
 
-              <span className="text-lg font-bold text-accent-secondary">
-                NPR{" "}
-                {(
-                  Number(pkg.price) * Number(persons || 0)
-                ).toLocaleString()}
-              </span>
-            </div>
+                  <input
+                    type="date"
+                    required
+                    min={new Date().toISOString().split("T")[0]}
+                    className="input-field"
+                    value={travelDate}
+                    onChange={(e) => setTravelDate(e.target.value)}
+                  />
+                </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="btn-primary w-full"
-            >
-              {submitting
-                ? "Booking..."
-                : user
-                ? "Confirm Booking"
-                : "Log in to Book"}
-            </button>
-          </form>
+                <div>
+                  <label className="mb-1.5 block text-sm text-text-muted">
+                    Persons
+                  </label>
+
+                  <input
+                    type="number"
+                    min={1}
+                    required
+                    className="input-field"
+                    value={persons}
+                    onChange={(e) => setPersons(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between border-t border-base-border pt-4 text-sm">
+                  <span className="text-text-muted">Total</span>
+
+                  <span className="text-lg font-bold text-accent-secondary">
+                    NPR{" "}
+                    {(
+                      Number(pkg.price) * Number(persons || 0)
+                    ).toLocaleString()}
+                  </span>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary w-full"
+                >
+                  {submitting
+                    ? "Booking..."
+                    : "Confirm Booking"}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>
