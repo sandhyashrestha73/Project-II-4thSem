@@ -14,6 +14,7 @@ import Destinations from "./pages/Destinations";
 import DestinationDetail from "./pages/DestinationDetail";
 import Packages from "./pages/Packages";
 import PackageDetail from "./pages/PackageDetail";
+import ComparePackages from "./pages/ComparePackages";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import Gallery from "./pages/Gallery";
@@ -151,6 +152,14 @@ export default function App() {
         }
       />
 
+        <Route
+          path="/compare-packages"
+          element={
+           <PublicLayout>
+            <ComparePackages />
+           </PublicLayout>
+            }
+        />
       <Route
         path="/blog"
         element={
