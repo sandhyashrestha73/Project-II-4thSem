@@ -13,8 +13,8 @@ export default function PrivacyPolicy() {
           </h1>
 
           <p className="mt-4 text-text-muted">
-            Your privacy is important to us. This page explains how TourEase
-            Nepal handles information provided through the platform.
+            Your privacy is important to us. This Privacy Policy explains how TourEase Nepal collects,
+             uses, stores, and protects your information when you use our platform.
           </p>
         </div>
       </section>

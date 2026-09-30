@@ -77,15 +77,7 @@ export default function Terms() {
             </p>
           </div>
 
-          <div>
-            <h2 className="text-xl font-bold text-text-main">
-              6. Changes to These Terms
-            </h2>
-            <p className="mt-3">
-              These terms may be updated as the TourEase Nepal platform and its
-              features develop.
-            </p>
-          </div>
+          
         </div>
       </section>
     </div>

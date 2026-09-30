@@ -1,15 +1,21 @@
 from flask import Blueprint, request
+from flask_jwt_extended import get_jwt_identity
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from database import db
 from models.booking import Booking
+from models.tourists import Tourist
 from utils.authorization import role_required
-from flask_jwt_extended import get_jwt_identity
 
 
 booking_bp = Blueprint("booking", __name__)
 
 
+# =========================================================
 # CREATE BOOKING
+# =========================================================
+
 @booking_bp.route("/api/booking", methods=["POST"])
 @role_required("tourist")
 def create_booking():
@@ -29,13 +35,27 @@ def create_booking():
     total_amount = data.get("total_amount")
     status = data.get("status", "Pending")
 
-    if not tourist_id or not package_id or not travel_date or persons is None or total_amount is None:
+    if (
+        not tourist_id
+        or not package_id
+        or not travel_date
+        or persons is None
+        or total_amount is None
+    ):
         return {
             "success": False,
-            "message": "Tourist ID, package ID, travel date, persons and total amount are required"
+            "message": (
+                "Tourist ID, package ID, travel date, "
+                "persons and total amount are required"
+            )
         }, 400
 
-    if status not in ["Pending", "Confirmed", "Cancelled"]:
+    if status not in [
+        "Pending",
+        "Confirmed",
+        "Completed",
+        "Cancelled"
+    ]:
         return {
             "success": False,
             "message": "Invalid booking status"
@@ -53,9 +73,18 @@ def create_booking():
             "message": "Total amount cannot be negative"
         }, 400
 
+    # =====================================================
+    # CURRENT NEPAL DATE + TIME
+    # =====================================================
+
+    nepal_time = datetime.now(
+        ZoneInfo("Asia/Kathmandu")
+    )
+
     booking = Booking(
         tourist_id=tourist_id,
         package_id=package_id,
+        booking_date=nepal_time,
         travel_date=travel_date,
         persons=persons,
         total_amount=total_amount,
@@ -65,12 +94,19 @@ def create_booking():
     db.session.add(booking)
     db.session.commit()
 
+    tourist = Tourist.query.get(booking.tourist_id)
+
     return {
         "success": True,
         "message": "Booking created successfully",
         "booking": {
             "booking_id": booking.booking_id,
             "tourist_id": booking.tourist_id,
+            "tourist_name": (
+                tourist.full_name
+                if tourist
+                else "Unknown Tourist"
+            ),
             "package_id": booking.package_id,
             "booking_date": booking.booking_date,
             "travel_date": booking.travel_date,
@@ -81,33 +117,54 @@ def create_booking():
     }, 201
 
 
+# =========================================================
 # GET ALL BOOKINGS
+# =========================================================
+
 @booking_bp.route("/api/booking", methods=["GET"])
 @role_required("tourist", "agency", "admin")
 def get_bookings():
 
     bookings = Booking.query.all()
 
+    booking_list = []
+
+    for booking in bookings:
+
+        tourist = Tourist.query.get(
+            booking.tourist_id
+        )
+
+        booking_list.append({
+            "booking_id": booking.booking_id,
+            "tourist_id": booking.tourist_id,
+            "tourist_name": (
+                tourist.full_name
+                if tourist
+                else "Unknown Tourist"
+            ),
+            "package_id": booking.package_id,
+            "booking_date": booking.booking_date,
+            "travel_date": booking.travel_date,
+            "persons": booking.persons,
+            "total_amount": booking.total_amount,
+            "status": booking.status
+        })
+
     return {
         "success": True,
-        "bookings": [
-            {
-                "booking_id": booking.booking_id,
-                "tourist_id": booking.tourist_id,
-                "package_id": booking.package_id,
-                "booking_date": booking.booking_date,
-                "travel_date": booking.travel_date,
-                "persons": booking.persons,
-                "total_amount": booking.total_amount,
-                "status": booking.status
-            }
-            for booking in bookings
-        ]
+        "bookings": booking_list
     }, 200
 
 
+# =========================================================
 # GET SINGLE BOOKING
-@booking_bp.route("/api/booking/<int:booking_id>", methods=["GET"])
+# =========================================================
+
+@booking_bp.route(
+    "/api/booking/<int:booking_id>",
+    methods=["GET"]
+)
 @role_required("tourist", "agency", "admin")
 def get_booking(booking_id):
 
@@ -119,11 +176,20 @@ def get_booking(booking_id):
             "message": "Booking not found"
         }, 404
 
+    tourist = Tourist.query.get(
+        booking.tourist_id
+    )
+
     return {
         "success": True,
         "booking": {
             "booking_id": booking.booking_id,
             "tourist_id": booking.tourist_id,
+            "tourist_name": (
+                tourist.full_name
+                if tourist
+                else "Unknown Tourist"
+            ),
             "package_id": booking.package_id,
             "booking_date": booking.booking_date,
             "travel_date": booking.travel_date,
@@ -134,8 +200,14 @@ def get_booking(booking_id):
     }, 200
 
 
+# =========================================================
 # UPDATE BOOKING
-@booking_bp.route("/api/booking/<int:booking_id>", methods=["PUT"])
+# =========================================================
+
+@booking_bp.route(
+    "/api/booking/<int:booking_id>",
+    methods=["PUT"]
+)
 @role_required("tourist", "agency", "admin")
 def update_booking(booking_id):
 
@@ -165,6 +237,7 @@ def update_booking(booking_id):
         booking.travel_date = data["travel_date"]
 
     if "persons" in data:
+
         if data["persons"] <= 0:
             return {
                 "success": False,
@@ -174,6 +247,7 @@ def update_booking(booking_id):
         booking.persons = data["persons"]
 
     if "total_amount" in data:
+
         if data["total_amount"] < 0:
             return {
                 "success": False,
@@ -184,7 +258,12 @@ def update_booking(booking_id):
 
     if "status" in data:
 
-        if data["status"] not in ["Pending", "Confirmed", "Cancelled"]:
+        if data["status"] not in [
+            "Pending",
+            "Confirmed",
+            "Completed",
+            "Cancelled"
+        ]:
             return {
                 "success": False,
                 "message": "Invalid booking status"
@@ -194,12 +273,21 @@ def update_booking(booking_id):
 
     db.session.commit()
 
+    tourist = Tourist.query.get(
+        booking.tourist_id
+    )
+
     return {
         "success": True,
         "message": "Booking updated successfully",
         "booking": {
             "booking_id": booking.booking_id,
             "tourist_id": booking.tourist_id,
+            "tourist_name": (
+                tourist.full_name
+                if tourist
+                else "Unknown Tourist"
+            ),
             "package_id": booking.package_id,
             "booking_date": booking.booking_date,
             "travel_date": booking.travel_date,
@@ -210,8 +298,14 @@ def update_booking(booking_id):
     }, 200
 
 
+# =========================================================
 # DELETE BOOKING
-@booking_bp.route("/api/booking/<int:booking_id>", methods=["DELETE"])
+# =========================================================
+
+@booking_bp.route(
+    "/api/booking/<int:booking_id>",
+    methods=["DELETE"]
+)
 @role_required("admin")
 def delete_booking(booking_id):
 
@@ -232,8 +326,14 @@ def delete_booking(booking_id):
     }, 200
 
 
+# =========================================================
+# CANCEL BOOKING
+# =========================================================
 
-@booking_bp.route("/api/booking/<int:booking_id>/cancel", methods=["PUT"])
+@booking_bp.route(
+    "/api/booking/<int:booking_id>/cancel",
+    methods=["PUT"]
+)
 @role_required("tourist")
 def cancel_booking(booking_id):
 
@@ -262,7 +362,6 @@ def cancel_booking(booking_id):
             "message": "Booking is already cancelled"
         }, 400
 
-    # Cancel booking
     booking.status = "Cancelled"
 
     db.session.commit()
@@ -275,3 +374,4 @@ def cancel_booking(booking_id):
             "status": booking.status
         }
     }, 200
+

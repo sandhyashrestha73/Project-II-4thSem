@@ -1,13 +1,21 @@
 import os
 
 from flask import Blueprint, request
+from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
 
 from database import db
 from models.gallery import Gallery
+from models.agency import Agency
 from utils.authorization import role_required
 
+
 gallery_bp = Blueprint("gallery", __name__)
+
+
+# =========================================================
+# UPLOAD CONFIGURATION
+# =========================================================
 
 UPLOAD_FOLDER = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
@@ -20,11 +28,93 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 def allowed_file(filename):
     return (
         "." in filename
-        and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+        and filename.rsplit(".", 1)[1].lower()
+        in ALLOWED_EXTENSIONS
     )
 
 
+def save_image(image_file):
+
+    if not image_file or not image_file.filename:
+        return None
+
+    if not allowed_file(image_file.filename):
+        return None
+
+    os.makedirs(
+        UPLOAD_FOLDER,
+        exist_ok=True
+    )
+
+    filename = secure_filename(
+        image_file.filename
+    )
+
+    base, extension = os.path.splitext(
+        filename
+    )
+
+    counter = 1
+    final_filename = filename
+
+    while os.path.exists(
+        os.path.join(
+            UPLOAD_FOLDER,
+            final_filename
+        )
+    ):
+        final_filename = (
+            f"{base}_{counter}{extension}"
+        )
+        counter += 1
+
+    image_file.save(
+        os.path.join(
+            UPLOAD_FOLDER,
+            final_filename
+        )
+    )
+
+    return f"/uploads/{final_filename}"
+
+
+def delete_image(image_path):
+
+    if not image_path:
+        return
+
+    filename = image_path.split("/")[-1]
+
+    file_path = os.path.join(
+        UPLOAD_FOLDER,
+        filename
+    )
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+
+# =========================================================
+# GET AGENCY NAME
+# =========================================================
+
+def get_agency_name(agency_id):
+
+    if not agency_id:
+        return None
+
+    agency = Agency.query.get(agency_id)
+
+    if not agency:
+        return None
+
+    return agency.agency_name
+
+
+# =========================================================
 # CREATE IMAGE
+# =========================================================
+
 @gallery_bp.route("/api/gallery", methods=["POST"])
 @role_required("agency")
 def create_gallery():
@@ -48,28 +138,24 @@ def create_gallery():
     if not allowed_file(image_file.filename):
         return {
             "success": False,
-            "message": "Only PNG, JPG, JPEG and WEBP images are allowed"
+            "message": (
+                "Only PNG, JPG, JPEG and WEBP "
+                "images are allowed"
+            )
         }, 400
 
-    filename = secure_filename(image_file.filename)
+    image = save_image(image_file)
 
-    base, extension = os.path.splitext(filename)
-
-    counter = 1
-    final_filename = filename
-
-    while os.path.exists(os.path.join(UPLOAD_FOLDER, final_filename)):
-        final_filename = f"{base}_{counter}{extension}"
-        counter += 1
-
-    image_file.save(
-        os.path.join(UPLOAD_FOLDER, final_filename)
-    )
+    if not image:
+        return {
+            "success": False,
+            "message": "Failed to save gallery image"
+        }, 400
 
     gallery = Gallery(
         agency_id=agency_id,
         title=title,
-        image=f"/uploads/{final_filename}"
+        image=image
     )
 
     db.session.add(gallery)
@@ -81,6 +167,7 @@ def create_gallery():
         "gallery": {
             "image_id": gallery.image_id,
             "agency_id": gallery.agency_id,
+            "agency_name": get_agency_name(gallery.agency_id),
             "title": gallery.title,
             "image": gallery.image,
             "uploaded_at": gallery.uploaded_at
@@ -88,7 +175,10 @@ def create_gallery():
     }, 201
 
 
+# =========================================================
 # GET ALL IMAGES
+# =========================================================
+
 @gallery_bp.route("/api/gallery", methods=["GET"])
 def get_gallery():
 
@@ -100,6 +190,7 @@ def get_gallery():
             {
                 "image_id": gallery.image_id,
                 "agency_id": gallery.agency_id,
+                "agency_name": get_agency_name(gallery.agency_id),
                 "title": gallery.title,
                 "image": gallery.image,
                 "uploaded_at": gallery.uploaded_at
@@ -109,8 +200,14 @@ def get_gallery():
     }, 200
 
 
+# =========================================================
 # GET SINGLE IMAGE
-@gallery_bp.route("/api/gallery/<int:image_id>", methods=["GET"])
+# =========================================================
+
+@gallery_bp.route(
+    "/api/gallery/<int:image_id>",
+    methods=["GET"]
+)
 def get_gallery_image(image_id):
 
     gallery = Gallery.query.get(image_id)
@@ -126,6 +223,7 @@ def get_gallery_image(image_id):
         "gallery": {
             "image_id": gallery.image_id,
             "agency_id": gallery.agency_id,
+            "agency_name": get_agency_name(gallery.agency_id),
             "title": gallery.title,
             "image": gallery.image,
             "uploaded_at": gallery.uploaded_at
@@ -133,8 +231,14 @@ def get_gallery_image(image_id):
     }, 200
 
 
+# =========================================================
 # UPDATE IMAGE
-@gallery_bp.route("/api/gallery/<int:image_id>", methods=["PUT"])
+# =========================================================
+
+@gallery_bp.route(
+    "/api/gallery/<int:image_id>",
+    methods=["PUT"]
+)
 @role_required("admin", "agency")
 def update_gallery(image_id):
 
@@ -154,41 +258,22 @@ def update_gallery(image_id):
 
     if image_file:
 
-        if not allowed_file(image_file.filename):
+        new_image = save_image(image_file)
+
+        if not new_image:
             return {
                 "success": False,
-                "message": "Only PNG, JPG, JPEG and WEBP images are allowed"
+                "message": (
+                    "Only PNG, JPG, JPEG and WEBP "
+                    "images are allowed"
+                )
             }, 400
 
-        filename = secure_filename(image_file.filename)
+        old_image = gallery.image
 
-        base, extension = os.path.splitext(filename)
+        gallery.image = new_image
 
-        counter = 1
-        final_filename = filename
-
-        while os.path.exists(
-            os.path.join(UPLOAD_FOLDER, final_filename)
-        ):
-            final_filename = f"{base}_{counter}{extension}"
-            counter += 1
-
-        image_file.save(
-            os.path.join(UPLOAD_FOLDER, final_filename)
-        )
-
-        # Delete old image
-        if gallery.image:
-            old_filename = gallery.image.split("/")[-1]
-            old_path = os.path.join(
-                UPLOAD_FOLDER,
-                old_filename
-            )
-
-            if os.path.exists(old_path):
-                os.remove(old_path)
-
-        gallery.image = f"/uploads/{final_filename}"
+        delete_image(old_image)
 
     db.session.commit()
 
@@ -198,6 +283,7 @@ def update_gallery(image_id):
         "gallery": {
             "image_id": gallery.image_id,
             "agency_id": gallery.agency_id,
+            "agency_name": get_agency_name(gallery.agency_id),
             "title": gallery.title,
             "image": gallery.image,
             "uploaded_at": gallery.uploaded_at
@@ -205,8 +291,14 @@ def update_gallery(image_id):
     }, 200
 
 
+# =========================================================
 # DELETE IMAGE
-@gallery_bp.route("/api/gallery/<int:image_id>", methods=["DELETE"])
+# =========================================================
+
+@gallery_bp.route(
+    "/api/gallery/<int:image_id>",
+    methods=["DELETE"]
+)
 @role_required("admin", "agency")
 def delete_gallery(image_id):
 
@@ -218,21 +310,12 @@ def delete_gallery(image_id):
             "message": "Gallery image not found"
         }, 404
 
-    image_path = None
-
-    if gallery.image:
-        old_filename = gallery.image.split("/")[-1]
-        image_path = os.path.join(
-            UPLOAD_FOLDER,
-            old_filename
-        )
+    image_path = gallery.image
 
     db.session.delete(gallery)
     db.session.commit()
 
-    # Delete physical image
-    if image_path and os.path.exists(image_path):
-        os.remove(image_path)
+    delete_image(image_path)
 
     return {
         "success": True,

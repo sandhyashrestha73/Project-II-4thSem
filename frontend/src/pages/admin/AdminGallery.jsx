@@ -14,9 +14,12 @@ export default function AdminGallery() {
   function load() {
     setLoading(true);
     setError("");
+
     getGallery()
       .then(setImages)
-      .catch((err) => setError(extractErrorMessage(err, "Could not load the gallery.")))
+      .catch((err) =>
+        setError(extractErrorMessage(err, "Could not load the gallery."))
+      )
       .finally(() => setLoading(false));
   }
 
@@ -24,34 +27,58 @@ export default function AdminGallery() {
 
   async function handleDelete(id) {
     if (!window.confirm("Remove this image?")) return;
+
     try {
       await deleteGalleryImage(id);
-      setImages((prev) => prev.filter((img) => img.image_id !== id));
+      setImages((prev) =>
+        prev.filter((img) => img.image_id !== id)
+      );
     } catch (err) {
       alert(extractErrorMessage(err, "Could not remove this image."));
     }
   }
 
   return (
-    <DashboardLayout portalLabel="ADMIN PORTAL" navItems={adminNavItems}>
+    <DashboardLayout
+      portalLabel="ADMIN PORTAL"
+      navItems={adminNavItems}
+    >
       <h1 className="section-title">Gallery</h1>
 
       <div className="mt-8">
         {loading && <Loader label="Loading gallery..." />}
-        {!loading && error && <ErrorMessage message={error} onRetry={load} />}
-        {!loading && !error && images.length === 0 && (
-          <div className="card p-10 text-center text-slate-400">No images uploaded yet.</div>
+
+        {!loading && error && (
+          <ErrorMessage message={error} onRetry={load} />
         )}
+
+        {!loading && !error && images.length === 0 && (
+          <div className="card p-10 text-center text-slate-400">
+            No images uploaded yet.
+          </div>
+        )}
+
         {!loading && !error && images.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4">
             {images.map((img) => (
               <div key={img.image_id} className="card overflow-hidden">
                 <div className="h-32 w-full bg-base-surface">
-                  <img src={getImageUrl(img.image)} alt={img.title} className="h-full w-full object-cover" />
+                  <img
+                    src={getImageUrl(img.image)}
+                    alt={img.title}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
+
                 <div className="p-3">
-                  <p className="truncate text-sm text-white">{img.title}</p>
-                  <p className="text-xs text-slate-500">Agency #{img.agency_id}</p>
+                  <p className="truncate text-sm text-white">
+                    {img.title}
+                  </p>
+
+                  <p className="text-xs text-slate-500">
+                    {img.agency_name || `Agency #${img.agency_id}`}
+                  </p>
+
                   <button
                     onClick={() => handleDelete(img.image_id)}
                     className="mt-2 text-xs font-medium text-red-400 hover:underline"

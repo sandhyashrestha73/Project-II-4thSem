@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 
 export const agencyNavItems = [
   { to: "/agency/dashboard", label: "Overview & Analytics", end: true },
+  { to: "/agency/destinations", label: "Destinations" },
   { to: "/agency/packages", label: "Manage Packages" },
   { to: "/agency/guides", label: "Guides" },
   { to: "/agency/bookings", label: "Booking Requests" },

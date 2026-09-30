@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 
 from database import db
 from models.blog import Blog
+from models.agency import Agency
 from utils.authorization import role_required
 
 
@@ -94,6 +95,23 @@ def delete_image(image_path):
 
 
 # =========================================================
+# GET AGENCY NAME
+# =========================================================
+
+def get_agency_name(agency_id):
+
+    if not agency_id:
+        return None
+
+    agency = Agency.query.get(agency_id)
+
+    if not agency:
+        return None
+
+    return agency.agency_name
+
+
+# =========================================================
 # CREATE BLOG
 # =========================================================
 
@@ -117,6 +135,7 @@ def create_blog():
     image = None
 
     if image_file:
+
         image = save_image(image_file)
 
         if not image:
@@ -144,6 +163,7 @@ def create_blog():
         "blog": {
             "blog_id": blog.blog_id,
             "agency_id": blog.agency_id,
+            "agency_name": get_agency_name(blog.agency_id),
             "title": blog.title,
             "content": blog.content,
             "image": blog.image,
@@ -167,6 +187,7 @@ def get_blogs():
             {
                 "blog_id": blog.blog_id,
                 "agency_id": blog.agency_id,
+                "agency_name": get_agency_name(blog.agency_id),
                 "title": blog.title,
                 "content": blog.content,
                 "image": blog.image,
@@ -197,6 +218,7 @@ def get_blog(blog_id):
         "blog": {
             "blog_id": blog.blog_id,
             "agency_id": blog.agency_id,
+            "agency_name": get_agency_name(blog.agency_id),
             "title": blog.title,
             "content": blog.content,
             "image": blog.image,
@@ -273,6 +295,7 @@ def update_blog(blog_id):
         "blog": {
             "blog_id": blog.blog_id,
             "agency_id": blog.agency_id,
+            "agency_name": get_agency_name(blog.agency_id),
             "title": blog.title,
             "content": blog.content,
             "image": blog.image,

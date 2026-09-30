@@ -18,7 +18,7 @@ from models.blog import Blog
 from models.gallery import Gallery
 from models.admin import Admin
 from models.contact_message import ContactMessage
-
+from models.review import Review
 
 from routes.admin import admin_bp
 from routes.auth import auth_bp
@@ -30,6 +30,7 @@ from routes.blog import blog_bp
 from routes.gallery import gallery_bp
 from routes.contact import contact_bp
 from routes.agency import agency_bp
+from routes.review import review_bp
 
 app = Flask(__name__)
 
@@ -51,6 +52,8 @@ app.register_blueprint(blog_bp)
 app.register_blueprint(gallery_bp)
 app.register_blueprint(contact_bp)
 app.register_blueprint(agency_bp)
+app.register_blueprint(review_bp)
+
 
 @app.route("/")
 def home():

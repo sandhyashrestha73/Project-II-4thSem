@@ -4,11 +4,7 @@ from database import db
 class Booking(db.Model):
     __tablename__ = "bookings"
 
-    booking_id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True
-    )
+    booking_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
     tourist_id = db.Column(
         db.Integer,
@@ -22,23 +18,26 @@ class Booking(db.Model):
         nullable=False
     )
 
+    # Exact date + time when booking was created
     booking_date = db.Column(
-        db.Date,
+        db.DateTime,
         nullable=False,
-        server_default=db.func.current_date()
+        server_default=db.func.current_timestamp()
     )
 
     travel_date = db.Column(db.Date, nullable=False)
 
     persons = db.Column(db.Integer, nullable=False)
 
-    total_amount = db.Column(
-        db.Numeric(10, 2),
-        nullable=False
-    )
+    total_amount = db.Column(db.Numeric(10, 2), nullable=False)
 
     status = db.Column(
-        db.Enum("Pending", "Confirmed", "Cancelled"),
+        db.Enum(
+            "Pending",
+            "Confirmed",
+            "Completed",
+            "Cancelled"
+        ),
         nullable=False,
         default="Pending"
     )

@@ -123,7 +123,7 @@ export default function Contact() {
                 </p>
 
                 <p className="mt-1 text-sm text-text-muted">
-                  support@tourease.com
+                  toureasenepal@gmail.com
                 </p>
               </div>
 

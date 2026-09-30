@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { adminNavItems } from "./AdminDashboard";
@@ -9,10 +10,12 @@ import ErrorMessage, {
 import Modal from "../../components/Modal";
 
 import {
-  getDestinations,
+  getAdminDestinations,
   createDestination,
   updateDestination,
   deleteDestination,
+  approveDestination,
+  rejectDestination,
 } from "../../services/destinationService";
 
 const emptyForm = {
@@ -24,8 +27,11 @@ const emptyForm = {
 
 export default function AdminDestinations() {
   const [destinations, setDestinations] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [activeFilter, setActiveFilter] = useState("All");
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -34,15 +40,24 @@ export default function AdminDestinations() {
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [actionLoading, setActionLoading] = useState(null);
+
+  // =========================================================
+  // LOAD DESTINATIONS
+  // =========================================================
+
   function load() {
     setLoading(true);
     setError("");
 
-    getDestinations()
+    getAdminDestinations()
       .then(setDestinations)
       .catch((err) =>
         setError(
-          extractErrorMessage(err, "Could not load destinations.")
+          extractErrorMessage(
+            err,
+            "Could not load destinations."
+          )
         )
       )
       .finally(() => setLoading(false));
@@ -52,6 +67,10 @@ export default function AdminDestinations() {
     load();
   }, []);
 
+  // =========================================================
+  // CREATE
+  // =========================================================
+
   function openCreate() {
     setEditingId(null);
     setForm(emptyForm);
@@ -59,19 +78,27 @@ export default function AdminDestinations() {
     setModalOpen(true);
   }
 
-  function openEdit(d) {
-    setEditingId(d.destination_id);
+  // =========================================================
+  // EDIT
+  // =========================================================
+
+  function openEdit(destination) {
+    setEditingId(destination.destination_id);
 
     setForm({
-      name: d.name,
-      district: d.district,
-      description: d.description || "",
+      name: destination.name,
+      district: destination.district,
+      description: destination.description || "",
       image: null,
     });
 
     setFormError("");
     setModalOpen(true);
   }
+
+  // =========================================================
+  // IMAGE CHANGE
+  // =========================================================
 
   function handleFileChange(e) {
     const file = e.target.files[0];
@@ -86,17 +113,23 @@ export default function AdminDestinations() {
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      setFormError("Only JPG, JPEG, PNG and WEBP images are allowed.");
+      setFormError(
+        "Only JPG, JPEG, PNG and WEBP images are allowed."
+      );
       return;
     }
 
-    setForm((f) => ({
-      ...f,
+    setForm((current) => ({
+      ...current,
       image: file,
     }));
 
     setFormError("");
   }
+
+  // =========================================================
+  // SAVE DESTINATION
+  // =========================================================
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -116,10 +149,16 @@ export default function AdminDestinations() {
       }
 
       if (editingId) {
-        await updateDestination(editingId, formData);
+        await updateDestination(
+          editingId,
+          formData
+        );
       } else {
         if (!form.image) {
-          setFormError("Please select a destination image.");
+          setFormError(
+            "Please select a destination image."
+          );
+
           setSaving(false);
           return;
         }
@@ -129,24 +168,42 @@ export default function AdminDestinations() {
 
       setModalOpen(false);
       load();
+
     } catch (err) {
       setFormError(
-        extractErrorMessage(err, "Could not save this destination.")
+        extractErrorMessage(
+          err,
+          "Could not save this destination."
+        )
       );
     } finally {
       setSaving(false);
     }
   }
 
+  // =========================================================
+  // DELETE
+  // =========================================================
+
   async function handleDelete(id) {
-    if (!window.confirm("Delete this destination?")) return;
+    if (
+      !window.confirm(
+        "Delete this destination?"
+      )
+    ) {
+      return;
+    }
 
     try {
       await deleteDestination(id);
 
-      setDestinations((prev) =>
-        prev.filter((d) => d.destination_id !== id)
+      setDestinations((previous) =>
+        previous.filter(
+          (destination) =>
+            destination.destination_id !== id
+        )
       );
+
     } catch (err) {
       alert(
         extractErrorMessage(
@@ -157,18 +214,208 @@ export default function AdminDestinations() {
     }
   }
 
+  // =========================================================
+  // APPROVE
+  // =========================================================
+
+  async function handleApprove(id) {
+    if (
+      !window.confirm(
+        "Approve this destination?"
+      )
+    ) {
+      return;
+    }
+
+    setActionLoading(id);
+
+    try {
+      await approveDestination(id);
+
+      setDestinations((previous) =>
+        previous.map((destination) =>
+          destination.destination_id === id
+            ? {
+                ...destination,
+                status: "Approved",
+              }
+            : destination
+        )
+      );
+
+    } catch (err) {
+      alert(
+        extractErrorMessage(
+          err,
+          "Could not approve this destination."
+        )
+      );
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  // =========================================================
+  // REJECT
+  // =========================================================
+
+  async function handleReject(id) {
+    if (
+      !window.confirm(
+        "Reject this destination?"
+      )
+    ) {
+      return;
+    }
+
+    setActionLoading(id);
+
+    try {
+      await rejectDestination(id);
+
+      setDestinations((previous) =>
+        previous.map((destination) =>
+          destination.destination_id === id
+            ? {
+                ...destination,
+                status: "Rejected",
+              }
+            : destination
+        )
+      );
+
+    } catch (err) {
+      alert(
+        extractErrorMessage(
+          err,
+          "Could not reject this destination."
+        )
+      );
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  // =========================================================
+  // FILTER DESTINATIONS
+  // =========================================================
+
+  const filteredDestinations =
+    activeFilter === "All"
+      ? destinations
+      : destinations.filter(
+          (destination) =>
+            destination.status === activeFilter
+        );
+
+  // =========================================================
+  // STATUS COUNTS
+  // =========================================================
+
+  const allCount = destinations.length;
+
+  const pendingCount = destinations.filter(
+    (destination) =>
+      destination.status === "Pending"
+  ).length;
+
+  const approvedCount = destinations.filter(
+    (destination) =>
+      destination.status === "Approved"
+  ).length;
+
+  const rejectedCount = destinations.filter(
+    (destination) =>
+      destination.status === "Rejected"
+  ).length;
+
+  // =========================================================
+  // STATUS BADGE
+  // =========================================================
+
+  function getStatusClass(status) {
+    if (status === "Approved") {
+      return "bg-green-500/10 text-green-300 border-green-500/30";
+    }
+
+    if (status === "Rejected") {
+      return "bg-red-500/10 text-red-300 border-red-500/30";
+    }
+
+    return "bg-yellow-500/10 text-yellow-300 border-yellow-500/30";
+  }
+
   return (
     <DashboardLayout
       portalLabel="ADMIN PORTAL"
       navItems={adminNavItems}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="section-title">Destinations</h1>
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
 
-        <button onClick={openCreate} className="btn-primary">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="section-title">
+            Destinations
+          </h1>
+
+          <p className="mt-1 text-sm text-slate-400">
+            Manage destinations submitted by admin
+            and agencies.
+          </p>
+        </div>
+
+        <button
+          onClick={openCreate}
+          className="btn-primary"
+        >
           + Add Destination
         </button>
       </div>
+
+      {/* =====================================================
+          FILTER BUTTONS
+      ===================================================== */}
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        {[
+          {
+            label: "All",
+            count: allCount,
+          },
+          {
+            label: "Pending",
+            count: pendingCount,
+          },
+          {
+            label: "Approved",
+            count: approvedCount,
+          },
+          {
+            label: "Rejected",
+            count: rejectedCount,
+          },
+        ].map((filter) => (
+          <button
+            key={filter.label}
+            onClick={() =>
+              setActiveFilter(filter.label)
+            }
+            className={
+              activeFilter === filter.label
+                ? "rounded-lg bg-base-accent px-4 py-2 text-sm font-semibold text-black"
+                : "rounded-lg border border-base-border bg-base-card px-4 py-2 text-sm text-slate-300 hover:bg-base-surface"
+            }
+          >
+            {filter.label} ({filter.count})
+          </button>
+        ))}
+      </div>
+
+      {/* =====================================================
+          DESTINATIONS
+      ===================================================== */}
 
       <div className="mt-8">
         {loading && (
@@ -184,71 +431,185 @@ export default function AdminDestinations() {
 
         {!loading &&
           !error &&
-          destinations.length === 0 && (
+          filteredDestinations.length === 0 && (
             <div className="card p-10 text-center text-slate-400">
-              No destinations added yet.
+              No {activeFilter.toLowerCase()} destinations found.
             </div>
           )}
 
         {!loading &&
           !error &&
-          destinations.length > 0 && (
+          filteredDestinations.length > 0 && (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {destinations.map((d) => (
-                <div
-                  key={d.destination_id}
-                  className="card overflow-hidden"
-                >
-                  <div className="h-32 w-full bg-base-surface">
-                    {d.image ? (
-                      <img
-                        src={getImageUrl(d.image)}
-                        alt={d.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-slate-600">
-                        No image
+              {filteredDestinations.map(
+                (destination) => {
+                  const isPending =
+                    destination.status ===
+                    "Pending";
+
+                  const isProcessing =
+                    actionLoading ===
+                    destination.destination_id;
+
+                  return (
+                    <div
+                      key={
+                        destination.destination_id
+                      }
+                      className="card overflow-hidden"
+                    >
+                      {/* IMAGE */}
+
+                      <div className="h-40 w-full bg-base-surface">
+                        {destination.image ? (
+                          <img
+                            src={getImageUrl(
+                              destination.image
+                            )}
+                            alt={
+                              destination.name
+                            }
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-slate-600">
+                            No image
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  <div className="p-4">
-                    <p className="font-semibold text-white">
-                      {d.name}
-                    </p>
+                      {/* CONTENT */}
 
-                    <p className="mt-1 text-sm text-slate-400">
-                      {d.district}
-                    </p>
+                      <div className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-semibold text-white">
+                              {destination.name}
+                            </p>
 
-                    <div className="mt-4 flex gap-2">
-                      <button
-                        onClick={() => openEdit(d)}
-                        className="btn-secondary flex-1 text-sm"
-                      >
-                        Edit
-                      </button>
+                            <p className="mt-1 text-sm text-slate-400">
+                              {destination.district}
+                            </p>
+                          </div>
 
-                      <button
-                        onClick={() =>
-                          handleDelete(d.destination_id)
-                        }
-                        className="btn-danger flex-1 text-sm"
-                      >
-                        Delete
-                      </button>
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-xs font-medium ${getStatusClass(
+                              destination.status
+                            )}`}
+                          >
+                            {destination.status}
+                          </span>
+                        </div>
+
+                        {/* CREATED BY */}
+
+                        <div className="mt-4 rounded-lg bg-base-surface p-3">
+                          <p className="text-xs text-slate-500">
+                            Created by
+                          </p>
+
+                          <p className="mt-1 text-sm text-slate-200">
+                            {destination.created_by_type ===
+                            "agency"
+                              ? destination.created_by_agency_name ||
+                                `Agency #${destination.created_by_agency_id}`
+                              : "Admin"}
+                          </p>
+                        </div>
+
+                        {/* DESCRIPTION */}
+
+                        {destination.description && (
+                          <p className="mt-3 line-clamp-2 text-sm text-slate-400">
+                            {
+                              destination.description
+                            }
+                          </p>
+                        )}
+
+                        {/* ACTIONS */}
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {/* PENDING ACTIONS */}
+
+                          {isPending && (
+                            <>
+                              <button
+                                onClick={() =>
+                                  handleApprove(
+                                    destination.destination_id
+                                  )
+                                }
+                                disabled={
+                                  isProcessing
+                                }
+                                className="flex-1 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {isProcessing
+                                  ? "Processing..."
+                                  : "Approve"}
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  handleReject(
+                                    destination.destination_id
+                                  )
+                                }
+                                disabled={
+                                  isProcessing
+                                }
+                                className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
+
+                          {/* EDIT */}
+
+                          <button
+                            onClick={() =>
+                              openEdit(
+                                destination
+                              )
+                            }
+                            className="btn-secondary flex-1 text-sm"
+                          >
+                            Edit
+                          </button>
+
+                          {/* DELETE */}
+
+                          <button
+                            onClick={() =>
+                              handleDelete(
+                                destination.destination_id
+                              )
+                            }
+                            className="btn-danger flex-1 text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                }
+              )}
             </div>
           )}
       </div>
 
+      {/* =====================================================
+          ADD / EDIT MODAL
+      ===================================================== */}
+
       <Modal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() =>
+          setModalOpen(false)
+        }
         title={
           editingId
             ? "Edit Destination"
@@ -271,8 +632,8 @@ export default function AdminDestinations() {
             className="input-field"
             value={form.name}
             onChange={(e) =>
-              setForm((f) => ({
-                ...f,
+              setForm((current) => ({
+                ...current,
                 name: e.target.value,
               }))
             }
@@ -284,8 +645,8 @@ export default function AdminDestinations() {
             className="input-field"
             value={form.district}
             onChange={(e) =>
-              setForm((f) => ({
-                ...f,
+              setForm((current) => ({
+                ...current,
                 district: e.target.value,
               }))
             }
@@ -297,8 +658,8 @@ export default function AdminDestinations() {
             className="input-field resize-none"
             value={form.description}
             onChange={(e) =>
-              setForm((f) => ({
-                ...f,
+              setForm((current) => ({
+                ...current,
                 description: e.target.value,
               }))
             }
@@ -318,15 +679,17 @@ export default function AdminDestinations() {
 
             {form.image && (
               <p className="mt-2 text-sm text-slate-400">
-                Selected: {form.image.name}
+                Selected:{" "}
+                {form.image.name}
               </p>
             )}
 
-            {editingId && !form.image && (
-              <p className="mt-2 text-xs text-slate-500">
-                Leave empty to keep the existing image.
-              </p>
-            )}
+            {editingId &&
+              !form.image && (
+                <p className="mt-2 text-xs text-slate-500">
+                  Leave empty to keep the existing image.
+                </p>
+              )}
           </div>
 
           <button
@@ -345,3 +708,4 @@ export default function AdminDestinations() {
     </DashboardLayout>
   );
 }
+

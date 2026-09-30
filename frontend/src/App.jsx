@@ -33,6 +33,7 @@ import AgencyBookings from "./pages/agency/AgencyBookings";
 import AgencyBlog from "./pages/agency/AgencyBlog";
 import AgencyGallery from "./pages/agency/AgencyGallery";
 import AgencyProfile from "./pages/AgencyProfile";
+import AgencyDestinations from "./pages/agency/AgencyDestinations";
 import Agencies from "./pages/Agencies";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -313,6 +314,15 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+          path="/agency/destinations"
+          element={
+      <ProtectedRoute allowedRoles={["agency"]}>
+          <AgencyDestinations />
+      </ProtectedRoute>
+      }
+    />
 
       {/* =====================================================
           ADMIN PORTAL
