@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
@@ -134,7 +133,31 @@ export default function AdminDashboard() {
 
     getPendingAgencies()
       .then((data) => {
-        setAgencies(data || []);
+
+        // Newest registered agencies appear first.
+        // created_at is used first, agency_id as fallback.
+        const sortedAgencies = [...(data || [])].sort(
+          (a, b) => {
+            const dateA = a.created_at
+              ? new Date(a.created_at).getTime()
+              : 0;
+
+            const dateB = b.created_at
+              ? new Date(b.created_at).getTime()
+              : 0;
+
+            if (dateB !== dateA) {
+              return dateB - dateA;
+            }
+
+            return (
+              Number(b.agency_id || 0) -
+              Number(a.agency_id || 0)
+            );
+          }
+        );
+
+        setAgencies(sortedAgencies);
       })
       .catch((err) => {
         setAgencyError(
@@ -160,7 +183,31 @@ export default function AdminDashboard() {
 
     getContactMessages()
       .then((data) => {
-        setContactMessages(data || []);
+
+        // Newest contact messages appear first.
+        // created_at is used first, message_id as fallback.
+        const sortedMessages = [...(data || [])].sort(
+          (a, b) => {
+            const dateA = a.created_at
+              ? new Date(a.created_at).getTime()
+              : 0;
+
+            const dateB = b.created_at
+              ? new Date(b.created_at).getTime()
+              : 0;
+
+            if (dateB !== dateA) {
+              return dateB - dateA;
+            }
+
+            return (
+              Number(b.message_id || 0) -
+              Number(a.message_id || 0)
+            );
+          }
+        );
+
+        setContactMessages(sortedMessages);
       })
       .catch((err) => {
         setContactError(
@@ -316,10 +363,6 @@ export default function AdminDashboard() {
           ================================================== */}
 
           <div className="card mt-10 p-6">
-
-            {/* ------------------------------------------------
-                SECTION HEADER
-            ------------------------------------------------ */}
 
             <div className="flex items-center justify-between">
 
@@ -496,10 +539,6 @@ export default function AdminDashboard() {
 
           <div className="card mt-10 p-6">
 
-            {/* ------------------------------------------------
-                SECTION HEADER
-            ------------------------------------------------ */}
-
             <div className="flex items-center justify-between">
 
               <div>
@@ -513,6 +552,7 @@ export default function AdminDashboard() {
                 </p>
 
               </div>
+
 
               {/* Message Count */}
 
@@ -647,4 +687,3 @@ export default function AdminDashboard() {
     </DashboardLayout>
   );
 }
-

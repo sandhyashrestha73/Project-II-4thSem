@@ -43,20 +43,146 @@ export default function Agencies() {
   }, []);
 
   // =========================================================
+  // NEPAL DISTRICTS
+  // Used to identify the actual district from the address.
+  // =========================================================
+  const nepalDistricts = useMemo(
+    () => [
+      "Achham",
+      "Arghakhanchi",
+      "Baglung",
+      "Baitadi",
+      "Bajhang",
+      "Bajura",
+      "Banke",
+      "Bara",
+      "Bardiya",
+      "Bhaktapur",
+      "Bhojpur",
+      "Chitwan",
+      "Dadeldhura",
+      "Dailekh",
+      "Dang",
+      "Darchula",
+      "Dhading",
+      "Dhankuta",
+      "Dhanusha",
+      "Dolakha",
+      "Dolpa",
+      "Doti",
+      "Gorkha",
+      "Gulmi",
+      "Humla",
+      "Ilam",
+      "Jajarkot",
+      "Jhapa",
+      "Jumla",
+      "Kailali",
+      "Kalikot",
+      "Kanchanpur",
+      "Kapilvastu",
+      "Kaski",
+      "Kathmandu",
+      "Kavrepalanchok",
+      "Khotang",
+      "Lalitpur",
+      "Lamjung",
+      "Mahottari",
+      "Makwanpur",
+      "Manang",
+      "Morang",
+      "Mugu",
+      "Mustang",
+      "Myagdi",
+      "Nawalparasi East",
+      "Nawalparasi West",
+      "Nuwakot",
+      "Okhaldhunga",
+      "Palpa",
+      "Panchthar",
+      "Parasi",
+      "Parbat",
+      "Parsa",
+      "Pyuthan",
+      "Ramechhap",
+      "Rasuwa",
+      "Rautahat",
+      "Rolpa",
+      "Rukum East",
+      "Rukum West",
+      "Rupandehi",
+      "Salyan",
+      "Sankhuwasabha",
+      "Saptari",
+      "Sarlahi",
+      "Sindhuli",
+      "Sindhupalchok",
+      "Siraha",
+      "Solukhumbu",
+      "Sunsari",
+      "Surkhet",
+      "Syangja",
+      "Tanahun",
+      "Taplejung",
+      "Tehrathum",
+      "Udayapur",
+      "Kathmandu",
+      "Kaski",
+      "Lalitpur",
+      "Bhaktapur",
+    ],
+    []
+  );
+
+  // =========================================================
   // FORMAT DISTRICT / ADDRESS
-  // Example:
-  // "chitwan" -> "Chitwan"
-  // "kathmandu, nepal" -> "Kathmandu"
+  //
+  // Examples:
+  // "Shuklagandaki, Tanahun" -> "Tanahun"
+  // "Manung, Tanahun"        -> "Tanahun"
+  // "Kathmandu, Nepal"       -> "Kathmandu"
+  // "Chitwan"                -> "Chitwan"
+  //
+  // We check from the END of the address for a valid
+  // Nepal district instead of simply taking the first part.
   // =========================================================
   const formatDistrict = (address) => {
     if (!address) return "";
 
-    const districtName = address.split(",")[0].trim();
+    const parts = address
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean);
 
-    return (
-      districtName.charAt(0).toUpperCase() +
-      districtName.slice(1).toLowerCase()
-    );
+    if (parts.length === 0) return "";
+
+    // Check the address from right to left.
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const part = parts[i];
+
+      const matchedDistrict = nepalDistricts.find(
+        (item) =>
+          item.toLowerCase() === part.toLowerCase()
+      );
+
+      if (matchedDistrict) {
+        return matchedDistrict;
+      }
+    }
+
+    // If there is only one part and it is not Nepal,
+    // keep it as the location name.
+    if (
+      parts.length === 1 &&
+      parts[0].toLowerCase() !== "nepal"
+    ) {
+      return (
+        parts[0].charAt(0).toUpperCase() +
+        parts[0].slice(1).toLowerCase()
+      );
+    }
+
+    return "";
   };
 
   // =========================================================
@@ -642,4 +768,3 @@ export default function Agencies() {
     </div>
   );
 }
-
