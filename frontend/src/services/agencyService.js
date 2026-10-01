@@ -18,13 +18,24 @@ export const rejectAgency = (id) =>
     .put(`/api/admin/agencies/${id}/reject`)
     .then((res) => res.data);
 
-
- export async function getVerifiedAgencies() {
+// Get all verified agencies
+export async function getVerifiedAgencies() {
   const response = await api.get("/api/agency/verified");
   return response.data;
 }
 
+// Get single agency profile
 export async function getAgencyProfile(agencyId) {
   const response = await api.get(`/api/agency/${agencyId}`);
   return response.data;
 }
+
+// Get reviews for a specific agency
+export async function getAgencyReviews(agencyId) {
+  const response = await api.get(
+    `/api/agency/${agencyId}/reviews`
+  );
+
+  return response.data;
+}
+

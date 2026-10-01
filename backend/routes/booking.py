@@ -7,7 +7,7 @@ from database import db
 from models.booking import Booking
 from models.tourists import Tourist
 from utils.authorization import role_required
-
+from models.review import Review
 
 booking_bp = Blueprint("booking", __name__)
 
@@ -135,6 +135,11 @@ def get_bookings():
             booking.tourist_id
         )
 
+        # Check whether this booking already has a review
+        review = Review.query.filter_by(
+            booking_id=booking.booking_id
+        ).first()
+
         booking_list.append({
             "booking_id": booking.booking_id,
             "tourist_id": booking.tourist_id,
@@ -148,7 +153,11 @@ def get_bookings():
             "travel_date": booking.travel_date,
             "persons": booking.persons,
             "total_amount": booking.total_amount,
-            "status": booking.status
+            "status": booking.status,
+
+            # True = already reviewed
+            # False = not reviewed yet
+            "has_review": review is not None
         })
 
     return {
@@ -180,6 +189,11 @@ def get_booking(booking_id):
         booking.tourist_id
     )
 
+    # Check whether this booking already has a review
+    review = Review.query.filter_by(
+        booking_id=booking.booking_id
+    ).first()
+
     return {
         "success": True,
         "booking": {
@@ -195,7 +209,11 @@ def get_booking(booking_id):
             "travel_date": booking.travel_date,
             "persons": booking.persons,
             "total_amount": booking.total_amount,
-            "status": booking.status
+            "status": booking.status,
+
+            # True = already reviewed
+            # False = not reviewed yet
+            "has_review": review is not None
         }
     }, 200
 
@@ -374,4 +392,3 @@ def cancel_booking(booking_id):
             "status": booking.status
         }
     }, 200
-

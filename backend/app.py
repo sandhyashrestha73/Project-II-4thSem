@@ -31,6 +31,7 @@ from routes.gallery import gallery_bp
 from routes.contact import contact_bp
 from routes.agency import agency_bp
 from routes.review import review_bp
+from routes.tourist import tourist_bp
 
 app = Flask(__name__)
 
@@ -53,7 +54,7 @@ app.register_blueprint(gallery_bp)
 app.register_blueprint(contact_bp)
 app.register_blueprint(agency_bp)
 app.register_blueprint(review_bp)
-
+app.register_blueprint(tourist_bp)
 
 @app.route("/")
 def home():

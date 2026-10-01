@@ -9,7 +9,12 @@ import { useAuth } from "../../context/AuthContext";
 import { getPackages } from "../../services/packageService";
 import { getBookings, updateBooking } from "../../services/bookingService";
 
-const STATUSES = ["Pending", "Confirmed", "Cancelled"];
+const STATUSES = [
+  "Pending",
+  "Confirmed",
+  "Completed",
+  "Cancelled",
+];
 
 // Format booking date and exact time
 function formatBookingDateTime(dateString) {

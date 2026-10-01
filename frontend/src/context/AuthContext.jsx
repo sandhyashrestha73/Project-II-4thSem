@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+
 import {
   loginTourist,
   loginAgency,
@@ -9,7 +10,8 @@ import {
 
 const AuthContext = createContext(null);
 
-// Reads the previously saved session (if any) so a page refresh doesn't log the user out.
+// Reads the previously saved session (if any)
+// so a page refresh doesn't log the user out.
 function loadStoredUser() {
   const raw = localStorage.getItem("tourease_user");
   return raw ? JSON.parse(raw) : null;
@@ -19,6 +21,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(loadStoredUser);
   const [loading, setLoading] = useState(false);
 
+  // Save user information whenever it changes
   useEffect(() => {
     if (user) {
       localStorage.setItem("tourease_user", JSON.stringify(user));
@@ -27,28 +30,71 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
+  // Save login session
   function persistSession(token, role, profile, idField) {
     localStorage.setItem("tourease_token", token);
-    const sessionUser = { role, id: profile[idField], ...profile };
+
+    const sessionUser = {
+      role,
+      id: profile[idField],
+      ...profile,
+    };
+
     setUser(sessionUser);
+
     return sessionUser;
+  }
+
+  // Update only selected user information
+  // Example: profile_image after uploading a new photo
+  function updateUser(updatedData) {
+    setUser((currentUser) => {
+      if (!currentUser) return currentUser;
+
+      return {
+        ...currentUser,
+        ...updatedData,
+      };
+    });
   }
 
   async function login(role, email, password) {
     setLoading(true);
+
     try {
       if (role === "tourist") {
         const data = await loginTourist(email, password);
-        return persistSession(data.access_token, "tourist", data.tourist, "tourist_id");
+
+        return persistSession(
+          data.access_token,
+          "tourist",
+          data.tourist,
+          "tourist_id"
+        );
       }
+
       if (role === "agency") {
         const data = await loginAgency(email, password);
-        return persistSession(data.access_token, "agency", data.agency, "agency_id");
+
+        return persistSession(
+          data.access_token,
+          "agency",
+          data.agency,
+          "agency_id"
+        );
       }
+
       if (role === "admin") {
         const data = await loginAdmin(email, password);
-        return persistSession(data.access_token, "admin", data.admin, "admin_id");
+
+        return persistSession(
+          data.access_token,
+          "admin",
+          data.admin,
+          "admin_id"
+        );
       }
+
       throw new Error("Unknown role");
     } finally {
       setLoading(false);
@@ -57,6 +103,7 @@ export function AuthProvider({ children }) {
 
   async function registerAsTourist(payload) {
     setLoading(true);
+
     try {
       return await registerTourist(payload);
     } finally {
@@ -66,6 +113,7 @@ export function AuthProvider({ children }) {
 
   async function registerAsAgency(payload) {
     setLoading(true);
+
     try {
       return await registerAgency(payload);
     } finally {
@@ -76,6 +124,7 @@ export function AuthProvider({ children }) {
   function logout() {
     localStorage.removeItem("tourease_token");
     localStorage.removeItem("tourease_user");
+
     setUser(null);
   }
 
@@ -85,15 +134,24 @@ export function AuthProvider({ children }) {
     loading,
     login,
     logout,
+    updateUser,
     registerAsTourist,
     registerAsAgency,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+
   return ctx;
 }
