@@ -673,6 +673,10 @@ def forgot_password():
 
     role = role.lower().strip()
 
+    # =====================================================
+    # FIND USER BY ROLE
+    # =====================================================
+
     if role == "tourist":
         user = Tourist.query.filter_by(email=email).first()
 
@@ -688,14 +692,23 @@ def forgot_password():
             "message": "Invalid account type"
         }, 400
 
+    # =====================================================
+    # SECURITY:
+    # Do not reveal whether an email exists
+    # =====================================================
+
     if not user:
         return {
             "success": True,
             "message": (
                 "If the account exists, a password reset link "
-                "has been generated."
+                "has been sent."
             )
         }, 200
+
+    # =====================================================
+    # CREATE RESET TOKEN
+    # =====================================================
 
     serializer = get_reset_serializer()
 
@@ -709,17 +722,71 @@ def forgot_password():
         salt="password-reset"
     )
 
+    # =====================================================
+    # CREATE RESET LINK
+    # =====================================================
+
     reset_link = (
-        f"http://localhost:5173/reset-password?token={token}"
+        f"{current_app.config['FRONTEND_URL']}"
+        f"/reset-password?token={token}"
     )
 
-    print("\n========================================")
-    print("PASSWORD RESET LINK")
-    print(reset_link)
-    print("========================================\n")
+    # =====================================================
+    # SEND PASSWORD RESET EMAIL
+    # =====================================================
+
+    try:
+
+        msg = Message(
+            subject="TourEase Nepal - Password Reset",
+            recipients=[user.email]
+        )
+
+        msg.body = f"""
+Hello,
+
+We received a request to reset the password for your
+TourEase Nepal {role} account.
+
+Click the link below to reset your password:
+
+{reset_link}
+
+This password reset link is valid for 15 minutes.
+
+If you did not request a password reset, you can safely
+ignore this email.
+
+Regards,
+TourEase Nepal
+"""
+
+        current_app.extensions["mail"].send(msg)
+
+        print(
+            f"Password reset email sent to {user.email}"
+        )
+
+    except Exception as e:
+
+        print(
+            "Failed to send password reset email:",
+            e
+        )
+
+        return {
+            "success": False,
+            "message": "Failed to send password reset email."
+        }, 500
+
+    # =====================================================
+    # SUCCESS RESPONSE
+    # =====================================================
 
     return {
         "success": True,
-        "message": "Password reset link generated successfully.",
-        "reset_link": reset_link
+        "message": (
+            "If the account exists, a password reset link "
+            "has been sent."
+        )
     }, 200
