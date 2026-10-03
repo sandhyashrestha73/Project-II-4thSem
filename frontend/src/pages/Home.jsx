@@ -118,7 +118,7 @@ export default function Home() {
 
           <h1 className="hero-heading mt-5 leading-tight">
             Plan your next journey across{" "}
-            <span className="hero-heading-accent">
+              <span className="text-[#d4af37]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontWeight: 400 }}>
               Nepal
             </span>
           </h1>
@@ -415,8 +415,7 @@ export default function Home() {
 
           </section>
 
-
-          {/* ================= FEATURED TOUR PACKAGES ================= */}
+            {/* ================= FEATURED TOUR PACKAGES ================= */}
 
           <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
 
@@ -426,82 +425,149 @@ export default function Home() {
                 Featured Tour Packages
               </h2>
 
-              <Link
+            <Link
                 to="/packages"
                 className="text-sm font-medium text-accent-secondary hover:underline"
               >
-                View all →
-              </Link>
+              View all →
+            </Link>
 
-            </div>
-
-
-            {packages.length === 0 ? (
-
-              <p className="text-text-muted">
-                No packages available yet.
-              </p>
-
-            ) : (
-
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-
-                {packages.map((p) => (
-
-                  <Link
-                    key={p.package_id}
-                    to={`/packages/${p.package_id}`}
-                    className="card group overflow-hidden hover:-translate-y-1 hover:border-accent/50"
-                  >
-
-                    <div className="h-48 w-full overflow-hidden bg-base-surface">
-
-                      {p.image ? (
-
-                        <img
-                          src={getImageUrl(p.image)}
-                          alt={p.package_name}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-
-                      ) : (
-
-                        <div className="flex h-full items-center justify-center text-text-subtle">
-                          No image
-                        </div>
-
-                      )}
-
-                    </div>
+          </div>
 
 
-                    <div className="p-4">
+          {packages.length === 0 ? (
 
-                      <p className="font-semibold text-text-main">
-                        {p.package_name}
-                      </p>
+            <p className="text-text-muted">
+               No packages available yet.
+            </p>
 
-                      <p className="mt-1 text-sm text-text-muted">
-                        {p.duration}
-                      </p>
+          ) : (
 
-                      <p className="mt-2 font-bold text-accent-secondary">
-                        NPR {Number(p.price).toLocaleString()}
-                      </p>
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
 
-                    </div>
+              {packages.map((p) => {
 
-                  </Link>
+              const totalReviews = Number(p.total_reviews || 0);
+              const averageRating = Number(p.average_rating || 0);
 
-                ))}
+        return (
+          <div
+            key={p.package_id}
+            className="card group overflow-hidden hover:-translate-y-1 hover:border-accent/50"
+          >
+
+            {/* Package Image */}
+            <Link to={`/packages/${p.package_id}`}>
+
+              <div className="h-48 w-full overflow-hidden bg-base-surface">
+
+                {p.image ? (
+
+                  <img
+                    src={getImageUrl(p.image)}
+                    alt={p.package_name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+
+                ) : (
+
+                  <div className="flex h-full items-center justify-center text-text-subtle">
+                    No image
+                  </div>
+
+                )}
 
               </div>
 
-            )}
-
-          </section>
+            </Link>
 
 
+            {/* Package Information */}
+            <div className="p-4">
+
+              {/* Package Name */}
+              <p className="font-semibold text-text-main">
+                {p.package_name}
+              </p>
+
+
+              {/* Destination + Duration */}
+              <p className="mt-1 text-sm text-text-muted">
+                {p.destination_name || p.destination || "Nepal"} ·{" "}
+                {p.duration}
+              </p>
+
+
+              {/* Package Rating */}
+              <div className="mt-2 flex items-center gap-1 text-sm">
+
+                <span className="text-yellow-500">
+                  ⭐
+                </span>
+
+                {totalReviews > 0 ? (
+
+                  <>
+                    <span className="font-semibold text-text-main">
+                      {averageRating.toFixed(1)}
+                    </span>
+
+                    <span className="text-text-muted">
+                      ({totalReviews}{" "}
+                      {totalReviews === 1
+                        ? "review"
+                        : "reviews"}
+                      )
+                    </span>
+                  </>
+
+                ) : (
+
+                  <span className="text-text-muted">
+                    No reviews yet
+                  </span>
+
+                )}
+
+              </div>
+
+
+              {/* Agency Name */}
+              <p className="mt-2 text-sm font-medium text-text-main">
+                {p.agency_name || "TourEase Agency"}
+              </p>
+
+
+              {/* Price */}
+              <p className="mt-2 font-bold text-accent-secondary">
+                NPR {Number(p.price).toLocaleString()}
+              </p>
+
+
+              {/* Book Now */}
+              <div className="mt-4 flex justify-end">
+
+                <Link
+                  to={`/packages/${p.package_id}`}
+                  className="rounded-lg bg-[#0f172a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1e293b]"
+                >
+                  Book Now
+                </Link>
+
+              </div>
+
+            </div>
+
+          </div>
+        );
+
+      })}
+
+    </div>
+
+  )}
+
+</section>
           {/* ================= BLOGS ================= */}
 
           <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">

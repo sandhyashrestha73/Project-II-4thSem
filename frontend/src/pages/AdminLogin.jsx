@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { extractErrorMessage } from "../components/ErrorMessage";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminLogin() {
   const { login } = useAuth();
@@ -31,15 +32,10 @@ export default function AdminLogin() {
     setSubmitting(true);
 
     try {
-      const sessionUser = await login(
-        "admin",
-        form.email,
-        form.password
-      );
+      await login("admin", form.email, form.password);
 
       const redirectTo =
-        location.state?.from?.pathname ||
-        "/admin/dashboard";
+        location.state?.from?.pathname || "/admin/dashboard";
 
       navigate(redirectTo, {
         replace: true,
@@ -48,7 +44,7 @@ export default function AdminLogin() {
       setError(
         extractErrorMessage(
           err,
-          "Invalid admin email or password."
+          "Invalid email or password."
         )
       );
     } finally {
@@ -57,145 +53,168 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-base-bg px-4 py-12">
+    <div className="relative min-h-screen overflow-hidden">
 
-      <div className="w-full max-w-md">
+      {/* ================= BACKGROUND IMAGE ================= */}
+      <img
+          src="http://localhost:5000/uploads/admin2.png"
+          alt="TourEase Nepal"
+          className="absolute inset-0 h-full w-full object-fill"
+        />
+      {/* Soft Navy Overlay */}
+      <div className="absolute inset-0 bg-[#0f172a]/25" />
 
-        {/* Logo / Brand */}
-        <div className="mb-8 text-center">
+      {/* ================= MAIN CONTENT ================= */}
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
 
-          <p className="text-3xl font-extrabold text-white">
-            Tour<span className="text-accent">Ease</span> Nepal
-          </p>
+        <div className="w-full max-w-md">
 
-          <p className="mt-3 text-sm text-slate-400">
-            Administration Portal
-          </p>
+          {/* ================= BRAND ================= */}
+          <div className="mb-6 text-center">
 
-        </div>
+            <p className="text-3xl font-extrabold text-white drop-shadow-lg">
+              Tour<span className="text-[#d4af37]">Ease</span> Nepal
+            </p>
 
-        {/* Admin Login Card */}
-        <div className="card p-6 md:p-8">
-
-          <div className="text-center">
-
-            <h1 className="text-2xl font-bold text-white">
-              Admin Login
-            </h1>
-
-            <p className="mt-2 text-sm text-slate-400">
-              Sign in to access the TourEase administration portal.
+            <p className="mt-2 text-sm font-medium text-white/90 drop-shadow">
+              Administration Portal
             </p>
 
           </div>
 
-          {/* Error */}
-          {error && (
-            <p className="mt-6 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-              {error}
-            </p>
-          )}
+          {/* ================= TRANSPARENT LOGIN FORM ================= */}
+          <div className="rounded-2xl border border-white/20 bg-[#0f172a]/20 p-6 shadow-xl shadow-black/20 sm:p-8">
 
-          {/* Login Form */}
-          <form
-            onSubmit={handleSubmit}
-            className="mt-6 space-y-5"
-            autoComplete="off"
-          >
+            {/* Heading */}
+            <div className="text-center">
 
-            {/* Email */}
-            <div>
-              <label className="mb-1.5 block text-sm text-slate-300">
-                Admin Email
-              </label>
+              <p className="text-sm font-semibold uppercase tracking-wider text-[#f0d77a]">
+                Secure Access
+              </p>
 
-              <input
-                type="email"
-                required
-                name="admin-login-email"
-                autoComplete="off"
-                className="input-field"
-                value={form.email}
-                onChange={(e) =>
-                  update("email", e.target.value)
-                }
-                placeholder="Enter admin email"
-              />
+              <h1 className="mt-2 text-2xl font-bold text-white drop-shadow-md">
+                Admin Login
+              </h1>
+
+              <p className="mt-2 text-sm leading-6 text-white/90">
+                Sign in to access the TourEase administration portal.
+              </p>
+
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="mb-1.5 block text-sm text-slate-300">
-                Password
-              </label>
+            {/* ================= ERROR ================= */}
+            {error && (
+              <p className="mt-6 rounded-lg border border-red-300/40 bg-red-50/90 px-3 py-2 text-sm text-red-600">
+                {error}
+              </p>
+            )}
 
-              <div className="relative">
+            {/* ================= FORM ================= */}
+            <form
+              onSubmit={handleSubmit}
+              className="mt-6 space-y-5"
+              autoComplete="off"
+            >
+
+              {/* Email */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-white">
+                  Email
+                </label>
 
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type="email"
                   required
-                  name="admin-login-password"
-                  autoComplete="new-password"
-                  className="input-field pr-12"
-                  value={form.password}
+                  name="admin-login-email"
+                  autoComplete="off"
+                  className="input-field border border-white/25 bg-[#0f172a]/25 text-white placeholder:text-white/55 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]"
+                  value={form.email}
                   onChange={(e) =>
-                    update("password", e.target.value)
+                    update("email", e.target.value)
                   }
-                  placeholder="Enter admin password"
+                  placeholder="Enter admin email"
                 />
+              </div>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowPassword((prev) => !prev)
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-slate-400 hover:text-white"
-                  aria-label={
-                    showPassword
-                      ? "Hide password"
-                      : "Show password"
-                  }
+              {/* Password */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-white">
+                  Password
+                </label>
+
+                <div className="relative">
+
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    name="admin-login-password"
+                    autoComplete="new-password"
+                    className="input-field border border-white/25 bg-[#0f172a]/25 pr-12 text-white placeholder:text-white/55 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]"
+                    value={form.password}
+                    onChange={(e) =>
+                      update("password", e.target.value)
+                    }
+                    placeholder="Enter admin password"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowPassword((prev) => !prev)
+                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 transition hover:text-[#d4af37]"
+                    aria-label={
+                      showPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+
+                </div>
+              </div>
+
+              {/* Forgot Password */}
+              <div className="flex justify-end">
+
+                <Link
+                  to="/forgot-password?role=admin"
+                  className="text-sm font-medium text-white/90 transition-colors hover:text-[#d4af37] hover:underline"
                 >
-                  {showPassword ? "🙈" : "👁️"}
-                </button>
+                  Forgot password?
+                </Link>
 
               </div>
-            </div>
 
-            {/* Forgot Password */}
-            <div className="flex justify-end">
-
-              <Link
-                to="/forgot-password?role=admin"
-                className="text-sm font-medium text-accent hover:underline"
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full rounded-xl bg-[#d4af37] px-4 py-3 font-semibold text-[#0f172a] shadow-md transition-all hover:bg-[#c9a633] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Forgot password?
-              </Link>
+                {submitting
+                  ? "Logging in..."
+                  : "Admin Login"}
+              </button>
 
-            </div>
+            </form>
 
-            {/* Login Button */}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="btn-primary w-full"
-            >
-              {submitting
-                ? "Logging in..."
-                : "Admin Login"}
-            </button>
+          </div>
 
-          </form>
+          {/* ================= BOTTOM NOTE ================= */}
+          <p className="mt-5 text-center text-xs leading-5 text-white/85 drop-shadow">
+            This portal is restricted to authorized TourEase
+            administrators.
+          </p>
 
         </div>
-
-        {/* Small note */}
-        <p className="mt-5 text-center text-xs text-slate-500">
-          This portal is restricted to authorized TourEase administrators.
-        </p>
-
       </div>
-
     </div>
   );
 }
+

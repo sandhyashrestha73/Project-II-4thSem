@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { extractErrorMessage } from "../components/ErrorMessage";
+import { Eye, EyeOff } from "lucide-react";
 
 function PasswordInput({ value, onChange, placeholder = "Password" }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,7 +13,7 @@ function PasswordInput({ value, onChange, placeholder = "Password" }) {
         required
         type={showPassword ? "text" : "password"}
         placeholder={placeholder}
-        className="input-field pr-12"
+        className="input-field pr-12 placeholder:text-slate-500"
         value={value}
         onChange={onChange}
         autoComplete="new-password"
@@ -21,10 +22,10 @@ function PasswordInput({ value, onChange, placeholder = "Password" }) {
       <button
         type="button"
         onClick={() => setShowPassword((prev) => !prev)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-[#d4af37]"
         aria-label={showPassword ? "Hide password" : "Show password"}
       >
-        {showPassword ? "🙈" : "👁️"}
+        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
       </button>
     </div>
   );
@@ -96,24 +97,40 @@ export default function Register() {
   }
 
   return (
-    <div className="grid min-h-[calc(100vh-72px)] md:grid-cols-2">
+    <div className="grid h-[calc(100vh-72px)] md:grid-cols-2">
 
       {/* LEFT SIDE */}
-      <div className="hidden bg-gradient-to-br from-base-surface via-base-card to-base-bg md:flex md:items-center md:justify-center">
-        <div className="max-w-sm px-10 text-center">
-          <p className="text-3xl font-extrabold text-text-main">
-            Tour<span className="text-accent-secondary">Ease</span> Nepal
-          </p>
+<div className="relative hidden overflow-hidden bg-[#0f172a] md:block">
 
-          <p className="mt-4 text-text-muted">
-            Join as a traveler to book trips, or register your agency to list
-            packages.
-          </p>
-        </div>
-      </div>
+  <img
+    src="http://localhost:5000/uploads/loging.png"
+    alt="TourEase Nepal"
+    className="absolute inset-0 h-full w-full object-cover"
+  />
+
+  {/* Dark overlay */}
+  <div className="absolute inset-0 bg-[#0f172a]/45" />
+
+  {/* Text on image */}
+  <div className="relative flex h-full items-center justify-center">
+    <div className="max-w-sm px-10 text-center">
+
+      <p className="text-3xl font-extrabold text-white">
+        Tour<span className="text-[#d4af37]">Ease</span> Nepal
+      </p>
+
+      <p className="mt-4 text-slate-200">
+        Join as a traveler to book trips, or register
+        your agency to list packages.
+      </p>
+
+    </div>
+  </div>
+
+</div>
 
       {/* RIGHT SIDE */}
-      <div className="flex items-center justify-center px-4 py-16 md:px-10">
+        <div className="flex h-full items-center justify-center overflow-y-auto px-4 py-8 md:px-10">
         <div className="w-full max-w-md">
 
           <p className="text-2xl font-bold text-text-main">
@@ -175,7 +192,7 @@ export default function Register() {
               <input
                 required
                 placeholder="Full Name"
-                className="input-field"
+                className="input-field placeholder:text-slate-500"
                 value={touristForm.full_name}
                 onChange={(e) =>
                   updateTourist("full_name", e.target.value)
@@ -187,7 +204,7 @@ export default function Register() {
                 required
                 type="email"
                 placeholder="Email"
-                className="input-field"
+                className="input-field placeholder:text-slate-500"
                 value={touristForm.email}
                 onChange={(e) =>
                   updateTourist("email", e.target.value)
@@ -207,7 +224,7 @@ export default function Register() {
                 <input
                   required
                   placeholder="Phone"
-                  className="input-field"
+                  className="input-field placeholder:text-slate-500"
                   value={touristForm.phone}
                   onChange={(e) =>
                     updateTourist("phone", e.target.value)
@@ -241,7 +258,7 @@ export default function Register() {
               <input
                 required
                 placeholder="Agency Name"
-                className="input-field"
+                className="input-field placeholder:text-slate-500"
                 value={agencyForm.agency_name}
                 onChange={(e) =>
                   updateAgency("agency_name", e.target.value)
@@ -253,7 +270,7 @@ export default function Register() {
                 required
                 type="email"
                 placeholder="Email"
-                className="input-field"
+                className="input-field placeholder:text-slate-500"
                 value={agencyForm.email}
                 onChange={(e) =>
                   updateAgency("email", e.target.value)
@@ -273,7 +290,7 @@ export default function Register() {
                 <input
                   required
                   placeholder="Phone"
-                  className="input-field"
+                  className="input-field placeholder:text-slate-500"
                   value={agencyForm.phone}
                   onChange={(e) =>
                     updateAgency("phone", e.target.value)
@@ -286,7 +303,7 @@ export default function Register() {
               <input
                 required
                 placeholder="Address"
-                className="input-field"
+                className="input-field placeholder:text-slate-500"
                 value={agencyForm.address}
                 onChange={(e) =>
                   updateAgency("address", e.target.value)
@@ -297,7 +314,7 @@ export default function Register() {
               <input
                 required
                 placeholder="License Number"
-                className="input-field"
+                className="input-field placeholder:text-slate-500"
                 value={agencyForm.license_no}
                 onChange={(e) =>
                   updateAgency("license_no", e.target.value)
@@ -308,7 +325,7 @@ export default function Register() {
               <textarea
                 placeholder="Description (optional)"
                 rows={3}
-                className="input-field resize-none"
+                className="input-field resize-none placeholder:text-slate-500"
                 value={agencyForm.description}
                 onChange={(e) =>
                   updateAgency("description", e.target.value)

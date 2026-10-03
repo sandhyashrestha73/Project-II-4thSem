@@ -1,4 +1,17 @@
 import { useEffect, useState } from "react";
+import {
+  Package,
+  Plus,
+  MapPin,
+  Clock3,
+  IndianRupee,
+  ImagePlus,
+  Pencil,
+  Trash2,
+  Upload,
+  CheckCircle2,
+} from "lucide-react";
+
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { agencyNavItems } from "./AgencyDashboard";
 import Loader from "../../components/Loader";
@@ -241,22 +254,48 @@ export default function AgencyPackages() {
       portalLabel="AGENCY PORTAL"
       navItems={agencyNavItems}
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="section-title">
-          Manage Packages
-        </h1>
+      {/* =================================================
+          HEADER
+      ================================================= */}
 
-        <button
-          onClick={openCreate}
-          className="btn-primary"
-        >
-          + Add Package
-        </button>
+      <div className="rounded-2xl border border-slate-700 bg-[#0f172a] p-6 shadow-lg">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#d4af37]/15 text-[#d4af37]">
+              <Package size={25} />
+            </div>
+
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                Manage Packages
+              </h1>
+
+              <p className="mt-1 text-sm text-slate-300">
+                Create and manage the travel packages offered
+                by your agency.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 rounded-xl bg-[#d4af37] px-5 py-2.5 text-sm font-bold text-[#0f172a] transition hover:bg-[#c9a227]"
+          >
+            <Plus size={18} />
+            Add Package
+          </button>
+        </div>
       </div>
+
+      {/* =================================================
+          PACKAGES
+      ================================================= */}
 
       <div className="mt-8">
         {loading && (
-          <Loader label="Loading packages..." />
+          <div className="rounded-2xl border border-slate-700 bg-[#0f172a] p-6">
+            <Loader label="Loading packages..." />
+          </div>
         )}
 
         {!loading && error && (
@@ -269,8 +308,26 @@ export default function AgencyPackages() {
         {!loading &&
           !error &&
           packages.length === 0 && (
-            <div className="card p-10 text-center text-slate-400">
-              You haven't added any packages yet.
+            <div className="rounded-2xl border border-slate-700 bg-[#0f172a] p-10 text-center shadow-lg">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#d4af37]/10 text-[#d4af37]">
+                <Package size={30} />
+              </div>
+
+              <h2 className="mt-5 text-lg font-semibold text-white">
+                No Packages Yet
+              </h2>
+
+              <p className="mt-2 text-sm text-slate-400">
+                You haven't added any packages yet.
+              </p>
+
+              <button
+                onClick={openCreate}
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#d4af37] px-5 py-2.5 text-sm font-bold text-[#0f172a] transition hover:bg-[#c9a227]"
+              >
+                <Plus size={18} />
+                Add Package
+              </button>
             </div>
           )}
 
@@ -281,9 +338,11 @@ export default function AgencyPackages() {
               {packages.map((p) => (
                 <div
                   key={p.package_id}
-                  className="card overflow-hidden"
+                  className="overflow-hidden rounded-2xl border border-slate-700 bg-[#0f172a] shadow-lg transition hover:-translate-y-1 hover:border-[#d4af37]/40"
                 >
-                  <div className="h-36 w-full bg-base-surface">
+                  {/* IMAGE */}
+
+                  <div className="relative h-40 w-full bg-[#1e293b]">
                     {p.image ? (
                       <img
                         src={getImageUrl(p.image)}
@@ -291,35 +350,67 @@ export default function AgencyPackages() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center text-slate-600">
-                        No image
+                      <div className="flex h-full items-center justify-center text-slate-500">
+                        <div className="text-center">
+                          <ImagePlus
+                            size={28}
+                            className="mx-auto mb-2"
+                          />
+
+                          <span className="text-sm">
+                            No image
+                          </span>
+                        </div>
                       </div>
                     )}
+
+                    <div className="absolute left-3 top-3 rounded-full border border-[#d4af37]/30 bg-[#0f172a]/85 px-3 py-1 text-xs font-semibold text-[#d4af37] backdrop-blur-sm">
+                      Package
+                    </div>
                   </div>
 
-                  <div className="p-4">
-                    <p className="font-semibold text-white">
+                  {/* CONTENT */}
+
+                  <div className="p-5">
+                    <h3 className="font-bold text-white">
                       {p.package_name}
-                    </p>
+                    </h3>
 
-                    <p className="mt-1 text-sm text-slate-400">
-                      {p.duration}
-                    </p>
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-slate-400">
+                        <Clock3
+                          size={16}
+                          className="text-[#d4af37]"
+                        />
 
-                    <p className="mt-2 font-bold text-accent">
-                      NPR{" "}
-                      {Number(
-                        p.price
-                      ).toLocaleString()}
-                    </p>
+                        <span>{p.duration}</span>
+                      </div>
 
-                    <div className="mt-4 flex gap-2">
+                      <div className="flex items-center gap-2 text-sm text-slate-400">
+                        <IndianRupee
+                          size={16}
+                          className="text-[#d4af37]"
+                        />
+
+                        <span className="font-semibold text-[#d4af37]">
+                          NPR{" "}
+                          {Number(
+                            p.price
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* ACTIONS */}
+
+                    <div className="mt-5 flex gap-2 border-t border-slate-700 pt-4">
                       <button
                         onClick={() =>
                           openEdit(p)
                         }
-                        className="btn-secondary flex-1 text-sm"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-600 bg-[#1e293b] px-3 py-2.5 text-sm font-semibold text-white transition hover:border-[#d4af37] hover:bg-[#d4af37]/10 hover:text-[#d4af37]"
                       >
+                        <Pencil size={16} />
                         Edit
                       </button>
 
@@ -329,8 +420,9 @@ export default function AgencyPackages() {
                             p.package_id
                           )
                         }
-                        className="btn-danger flex-1 text-sm"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm font-semibold text-red-400 transition hover:bg-red-500/20"
                       >
+                        <Trash2 size={16} />
                         Delete
                       </button>
                     </div>
@@ -340,6 +432,10 @@ export default function AgencyPackages() {
             </div>
           )}
       </div>
+
+      {/* =================================================
+          PACKAGE MODAL
+      ================================================= */}
 
       <Modal
         open={modalOpen}
@@ -360,95 +456,155 @@ export default function AgencyPackages() {
           onSubmit={handleSubmit}
           className="space-y-4"
         >
-          <select
-            required
-            className="input-field"
-            value={form.destination_id}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                destination_id:
-                  e.target.value,
-              }))
-            }
-          >
-            <option value="">
-              Select destination
-            </option>
+          {/* DESTINATION */}
 
-            {destinations.map((d) => (
-              <option
-                key={d.destination_id}
-                value={d.destination_id}
-              >
-                {d.name}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-slate-500">
+              <MapPin
+                size={16}
+                className="text-[#d4af37]"
+              />
+              Destination
+            </label>
 
-          <input
-            required
-            placeholder="Package name"
-            className="input-field"
-            value={form.package_name}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                package_name:
-                  e.target.value,
-              }))
-            }
-          />
-
-          <textarea
-            required
-            rows={3}
-            placeholder="Description"
-            className="input-field resize-none"
-            value={form.description}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                description:
-                  e.target.value,
-              }))
-            }
-          />
-
-          <div className="grid grid-cols-2 gap-3">
-            <input
+            <select
               required
-              placeholder="Duration (e.g. 5 Days)"
               className="input-field"
-              value={form.duration}
+              value={form.destination_id}
               onChange={(e) =>
                 setForm((f) => ({
                   ...f,
-                  duration:
+                  destination_id:
                     e.target.value,
                 }))
               }
-            />
+            >
+              <option value="">
+                Select destination
+              </option>
+
+              {destinations.map((d) => (
+                <option
+                  key={d.destination_id}
+                  value={d.destination_id}
+                >
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* PACKAGE NAME */}
+
+          <div>
+            <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-slate-500">
+              <Package
+                size={16}
+                className="text-[#d4af37]"
+              />
+              Package Name
+            </label>
 
             <input
               required
-              type="number"
-              min={0}
-              placeholder="Price (NPR)"
+              placeholder="Package name"
               className="input-field"
-              value={form.price}
+              value={form.package_name}
               onChange={(e) =>
                 setForm((f) => ({
                   ...f,
-                  price:
+                  package_name:
                     e.target.value,
                 }))
               }
             />
           </div>
 
+          {/* DESCRIPTION */}
+
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-300">
+            <label className="mb-1.5 block text-sm font-medium text-slate-500">
+              Description
+            </label>
+
+            <textarea
+              required
+              rows={3}
+              placeholder="Description"
+              className="input-field resize-none"
+              value={form.description}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  description:
+                    e.target.value,
+                }))
+              }
+            />
+          </div>
+
+          {/* DURATION + PRICE */}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-slate-500">
+                <Clock3
+                  size={15}
+                  className="text-[#d4af37]"
+                />
+                Duration
+              </label>
+
+              <input
+                required
+                placeholder="e.g. 5 Days"
+                className="input-field"
+                value={form.duration}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    duration:
+                      e.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-slate-500">
+                <IndianRupee
+                  size={15}
+                  className="text-[#d4af37]"
+                />
+                Price
+              </label>
+
+              <input
+                required
+                type="number"
+                min={0}
+                placeholder="Price (NPR)"
+                className="input-field"
+                value={form.price}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    price:
+                      e.target.value,
+                  }))
+                }
+              />
+            </div>
+          </div>
+
+          {/* IMAGE */}
+
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-500">
+              <ImagePlus
+                size={16}
+                className="text-[#d4af37]"
+              />
               Package Image
             </label>
 
@@ -456,11 +612,15 @@ export default function AgencyPackages() {
               type="file"
               accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
               onChange={handleFileChange}
-              className="block w-full cursor-pointer rounded-lg border border-base-border bg-base-surface p-2 text-sm text-slate-300"
+              className="block w-full cursor-pointer rounded-xl border border-slate-600 bg-[#1e293b] p-2.5 text-sm text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-[#d4af37] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-[#0f172a]"
             />
 
             {form.image && (
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 flex items-center gap-2 text-xs text-slate-400">
+                <CheckCircle2
+                  size={14}
+                  className="text-emerald-400"
+                />
                 Selected: {form.image.name}
               </p>
             )}
@@ -472,11 +632,15 @@ export default function AgencyPackages() {
             )}
           </div>
 
+          {/* SUBMIT */}
+
           <button
             type="submit"
             disabled={saving}
-            className="btn-primary w-full"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#d4af37] px-5 py-3 text-sm font-bold text-[#0f172a] transition hover:bg-[#c9a227] disabled:cursor-not-allowed disabled:opacity-60"
           >
+            <Upload size={17} />
+
             {saving
               ? "Uploading..."
               : editingId

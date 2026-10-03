@@ -1,58 +1,60 @@
 /* src/styles/theme.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&display=swap');
+
 
 @import "tailwindcss";
 
 @theme {
   /* =========================
-     TOUR EASE — BLACK & YELLOW THEME
+     TOUR EASE — NAVY & GOLD THEME
      ========================= */
 
-  /* Dark backgrounds (black-based) */
-  --color-base-bg: #0d0d0d;
-  --color-base-card: #161616;
-  --color-base-surface: #1e1e1e;
-  --color-base-border: #2e2e2e;
+  /* Light backgrounds */
+  --color-base-bg: #fafaf8;
+  --color-base-card: #ffffff;
+  --color-base-surface: #f5f5f5;
+  --color-base-border: #e5e7eb;
 
-  /* Primary — near-black brand (used for on-light dark buttons/nav accents) */
-  --color-primary: #0a0a0a;
-  --color-primary-light: #1a1a1a;
-  --color-primary-soft: #262626;
+  /* Primary — navy */
+  --color-primary: #0f172a;
+  --color-primary-light: #1e293b;
+  --color-primary-soft: #334155;
 
-  /* Yellow accent */
-  --color-accent: #f5c518;
-  --color-accent-hover: #ddb00f;
-  --color-accent-soft: rgba(245, 197, 24, 0.14);
+  /* Gold accent */
+  --color-accent: #d4af37;
+  --color-accent-hover: #b9962f;
+  --color-accent-soft: rgba(212, 175, 55, 0.14);
 
-  /* Secondary — deeper gold (for on-light-surface emphasis if ever needed) */
-  --color-accent-secondary: #d4a80f;
-  --color-accent-secondary-hover: #b8930d;
-  --color-accent-secondary-soft: rgba(212, 168, 15, 0.12);
+  /* Secondary — deeper gold */
+  --color-accent-secondary: #b9962f;
+  --color-accent-secondary-hover: #9f8127;
+  --color-accent-secondary-soft: rgba(185, 150, 47, 0.12);
 
-  /* Text — on DARK backgrounds (this theme's default) */
-  --color-text-main: #f5f5f0;
-  --color-text-muted: #a8a8a0;
-  --color-text-subtle: #6e6e68;
+  /* Text — on LIGHT backgrounds */
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-subtle: #94a3b8;
 
-  /* Text — on the rare LIGHT/white surface (cards, modals) */
-  --color-text-on-light: #14140f;
-  --color-text-on-light-muted: #4a4a42;
+  /* Text — on LIGHT/white surfaces */
+  --color-text-on-light: #0f172a;
+  --color-text-on-light-muted: #475569;
 
-  /* Hero text — same dark bg, so same tokens as main */
+  /* Hero text — on dark background */
   --color-heading: #ffffff;
-  --color-hero-subtext: #c7c7bd;
-  --color-hero-accent: #f5c518;
-  --color-hero-badge-text: #1a1a1a;
+  --color-hero-subtext: #cbd5e1;
+  --color-hero-accent: #d4af37;
+  --color-hero-badge-text: #0f172a;
 
   /* White */
   --color-white: #ffffff;
 
   /* Status */
   --color-success: #2fbf71;
-  --color-warning: #f5c518;
+  --color-warning: #d4af37;
   --color-danger: #ef4444;
 
   /* Effects */
-  --shadow-glow: 0 0 24px rgba(245, 197, 24, 0.25);
+  --shadow-glow: 0 0 24px rgba(212, 175, 55, 0.25);
 
   --font-sans: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
@@ -80,8 +82,8 @@ body {
    ========================= */
 
 ::selection {
-  background: rgba(245, 197, 24, 0.35);
-  color: #0a0a0a;
+  background: rgba(212, 175, 55, 0.35);
+  color: #0f172a;
 }
 
 
@@ -95,16 +97,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #161616;
+  background: #f5f5f5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3a3a3a;
+  background: #cbd5e1;
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4d4d4d;
+  background: #94a3b8;
 }
 
 
@@ -114,35 +116,38 @@ body {
 
 @layer components {
 
-  /* DARK SECTION WRAPPER — kept for nav/footer, but whole site is dark now,
-     so this just makes a section pure black instead of base-bg */
+  /* DARK SECTION WRAPPER — navy sections */
   .section-dark {
     @apply bg-primary text-white;
   }
+
   .section-dark .text-muted-on-dark {
     color: var(--color-text-muted);
   }
 
-  /* HERO TEXT — bg is dark by default now */
+  /* HERO TEXT — dark background */
   .hero-heading {
     @apply text-4xl md:text-6xl font-extrabold;
     color: var(--color-heading);
   }
+
   .hero-heading-accent {
     color: var(--color-hero-accent);
   }
+
   .hero-subtext {
     @apply text-base md:text-lg;
     color: var(--color-hero-subtext);
   }
+
   .badge-hero {
     @apply inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold;
     background: var(--color-accent);
     border-color: var(--color-accent);
-    color: var(--color-hero-badge-text); /* dark text on solid yellow badge */
+    color: var(--color-hero-badge-text);
   }
 
-  /* PRIMARY BUTTON — yellow bg, near-black text (max contrast) */
+  /* PRIMARY BUTTON — gold */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2
       rounded-lg
@@ -155,10 +160,11 @@ body {
       active:scale-95
       disabled:opacity-50
       disabled:pointer-events-none;
+
     color: var(--color-hero-badge-text);
   }
 
-  /* SECONDARY BUTTON — outlined, for dark backgrounds (i.e. everywhere now) */
+  /* SECONDARY BUTTON — light surface */
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2
       rounded-lg
@@ -176,7 +182,7 @@ body {
       disabled:pointer-events-none;
   }
 
-  /* OUTLINE BUTTON — subtle border on dark bg */
+  /* OUTLINE BUTTON — for dark backgrounds */
   .btn-outline-light {
     @apply inline-flex items-center justify-center gap-2
       rounded-lg
@@ -193,7 +199,7 @@ body {
       disabled:pointer-events-none;
   }
 
-  /* DARK BUTTON — solid black, for use on a light surface (modals/cards) */
+  /* DARK BUTTON — navy, for light surfaces */
   .btn-dark {
     @apply inline-flex items-center justify-center gap-2
       rounded-lg
@@ -223,12 +229,12 @@ body {
       disabled:opacity-50;
   }
 
-  /* INPUT — dark surface, this is now the default everywhere */
+  /* INPUT — light surface */
   .input-field {
     @apply w-full
       rounded-lg
       border border-base-border
-      bg-base-surface
+      bg-base-card
       px-4 py-2.5
       text-text-main
       placeholder:text-text-subtle
@@ -239,7 +245,7 @@ body {
       focus:ring-accent/25;
   }
 
-  /* INPUT — hero search bar, slightly lifted card look */
+  /* INPUT — hero search bar */
   .input-field-hero {
     @apply w-full
       rounded-lg
@@ -256,7 +262,7 @@ body {
       focus:ring-accent/25;
   }
 
-  /* INPUT — kept name for compatibility; same dark treatment */
+  /* INPUT — kept name for compatibility; dark treatment */
   .input-field-on-dark {
     @apply w-full
       rounded-lg
@@ -273,25 +279,27 @@ body {
       focus:ring-accent/30;
   }
 
-  /* CARD */
+  /* CARD — white surface */
   .card {
     @apply rounded-xl
       border border-base-border
       bg-base-card
-      shadow-lg shadow-black/40
+      shadow-lg shadow-black/10
       transition-all duration-200
       hover:-translate-y-0.5
       hover:border-accent/40
       hover:shadow-xl;
   }
 
-  /* SECTION TITLE */
+  /* SECTION TITLE — for light backgrounds */
   .section-title {
     @apply text-2xl
       font-bold
-      text-white
+      text-text-main
       md:text-3xl;
   }
+
+  /* SECTION TITLE — for dark backgrounds */
   .section-title-on-dark {
     @apply text-2xl
       font-bold
@@ -310,6 +318,7 @@ body {
       font-semibold
       text-accent;
   }
+
   .badge-on-dark {
     @apply inline-flex items-center
       rounded-full
@@ -321,7 +330,6 @@ body {
       text-accent;
   }
 }
-
 
 
 @keyframes heroZoom {
@@ -340,4 +348,98 @@ body {
 
 .hero-background {
   animation: heroZoom 40s ease-in-out infinite;
+}
+
+
+
+
+/* =========================
+   PAGE HEADER — NAVY
+   Destinations / Packages / Blog / Gallery
+   ========================= */
+
+section.bg-base-surface.py-16 {
+  background-color: #0f172a !important;
+}
+
+/* Page header text */
+section.bg-base-surface.py-16 .section-title {
+  color: #ffffff;
+}
+
+section.bg-base-surface.py-16 .text-text-muted {
+  color: #cbd5e1;
+}
+
+
+
+
+
+/* =========================
+   CONTENT IMAGE PLACEHOLDERS
+   ========================= */
+
+section:not(.bg-base-surface) .bg-base-surface {
+  background-color: #ffffff;
+}
+
+
+/* =========================
+   GALLERY CARDS
+   ========================= */
+
+section:not(.bg-base-surface) button.bg-base-surface {
+  background-color: #ffffff;
+}
+
+
+/* =========================
+   FOOTER — FIGMA NAVY THEME
+   ========================= */
+
+footer {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+footer .text-text-main {
+  color: #ffffff;
+}
+
+footer .text-text-muted {
+  color: #cbd5e1;
+}
+
+footer .text-text-subtle {
+  color: #94a3b8;
+}
+
+footer .hover\:text-accent-secondary:hover {
+  color: #d4af37;
+}
+
+
+
+
+/* =========================
+   NAVBAR — FULLY TRANSPARENT
+   ========================= */
+
+header.sticky {
+  background: transparent !important;
+  background-color: transparent !important;
+
+  border-bottom-color: transparent !important;
+
+  /* NO BLUR */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* =========================
+   NAVBAR LINK HOVER
+   ========================= */
+
+header.sticky nav a:hover {
+  color: #d4af37 !important;
 }

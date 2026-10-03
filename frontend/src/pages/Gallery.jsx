@@ -162,6 +162,14 @@ export default function Gallery() {
               <h2 className="text-xl font-semibold text-white md:text-2xl">
                 {active.title}
               </h2>
+                {active.agency_name && (
+                <p className="mt-1 text-sm text-gray-300">
+                 Shared by{" "}
+                  <span className="font-medium text-accent">
+                  {active.agency_name}
+                  </span>
+                </p>
+                )}
             </div>
           </div>
         </div>

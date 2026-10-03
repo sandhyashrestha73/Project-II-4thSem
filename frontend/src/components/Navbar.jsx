@@ -99,7 +99,6 @@ export default function Navbar() {
       });
 
       setProfileMenuOpen(false);
-
     } catch (error) {
       console.error("Profile image upload error:", error);
 
@@ -147,7 +146,7 @@ export default function Navbar() {
                 `text-sm font-medium transition-colors ${
                   isActive
                     ? "text-accent-secondary"
-                    : "text-text-muted hover:text-text-main"
+                    : "text-[#0f172a] hover:text-accent-secondary"
                 }`
               }
             >
@@ -164,7 +163,7 @@ export default function Navbar() {
             <>
               <NavLink
                 to="/login"
-                className="text-sm font-medium text-text-muted hover:text-text-main"
+                className="text-sm font-medium text-[#0f172a] transition-colors hover:text-accent-secondary"
               >
                 Log in
               </NavLink>
@@ -183,7 +182,7 @@ export default function Navbar() {
             <>
               <NavLink
                 to="/my-bookings"
-                className="text-sm font-medium text-text-muted hover:text-text-main"
+                className="text-sm font-medium text-[#0f172a] transition-colors hover:text-accent-secondary"
               >
                 My Bookings
               </NavLink>
@@ -211,11 +210,11 @@ export default function Navbar() {
                     </div>
                   )}
 
-                  <span className="max-w-28 truncate text-sm font-medium text-text-main">
+                  <span className="max-w-28 truncate text-sm font-medium text-[#0f172a]">
                     {user.full_name}
                   </span>
 
-                  <span className="text-xs text-text-muted">
+                  <span className="text-xs text-[#0f172a]">
                     ▼
                   </span>
                 </button>
@@ -314,7 +313,7 @@ export default function Navbar() {
             <>
               <NavLink
                 to={dashboardPath}
-                className="text-sm font-medium text-text-muted hover:text-text-main"
+                className="text-sm font-medium text-[#0f172a] transition-colors hover:text-accent-secondary"
               >
                 Dashboard
               </NavLink>
@@ -332,7 +331,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Button */}
         <button
-          className="text-2xl text-text-main md:hidden"
+          className="text-2xl text-[#0f172a] md:hidden"
           onClick={() => setOpen((value) => !value)}
           aria-label="Toggle menu"
         >
@@ -351,7 +350,13 @@ export default function Navbar() {
               key={link.to}
               to={link.to}
               onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-2 text-text-main hover:bg-base-card"
+              className={({ isActive }) =>
+                `rounded-lg px-3 py-2 font-medium ${
+                  isActive
+                    ? "text-accent-secondary"
+                    : "text-[#0f172a] hover:bg-base-card"
+                }`
+              }
             >
               {link.label}
             </NavLink>
@@ -467,3 +472,4 @@ export default function Navbar() {
     </header>
   );
 }
+

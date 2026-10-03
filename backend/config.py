@@ -76,3 +76,10 @@ class Config:
         "FRONTEND_URL",
         "http://localhost:5173"
     )
+
+
+        # =========================
+    # GEMINI (AI) CONFIGURATION
+    # =========================
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")

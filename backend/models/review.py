@@ -22,6 +22,13 @@ class Review(db.Model):
         nullable=False
     )
 
+    # NEW: package being reviewed
+    package_id = db.Column(
+        db.Integer,
+        db.ForeignKey("packages.package_id"),
+        nullable=False
+    )
+
     booking_id = db.Column(
         db.Integer,
         db.ForeignKey("bookings.booking_id"),
@@ -51,6 +58,11 @@ class Review(db.Model):
 
     agency = db.relationship(
         "Agency",
+        backref="reviews"
+    )
+
+    package = db.relationship(
+        "Package",
         backref="reviews"
     )
 

@@ -1,5 +1,19 @@
-
 import { useEffect, useState } from "react";
+import {
+  MapPinned,
+  Plus,
+  MapPin,
+  ImagePlus,
+  Upload,
+  CheckCircle2,
+  Clock3,
+  XCircle,
+  Pencil,
+  Trash2,
+  FileText,
+  UserRound,
+} from "lucide-react";
+
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { adminNavItems } from "./AdminDashboard";
 import Loader from "../../components/Loader";
@@ -168,7 +182,6 @@ export default function AdminDestinations() {
 
       setModalOpen(false);
       load();
-
     } catch (err) {
       setFormError(
         extractErrorMessage(
@@ -203,7 +216,6 @@ export default function AdminDestinations() {
             destination.destination_id !== id
         )
       );
-
     } catch (err) {
       alert(
         extractErrorMessage(
@@ -242,7 +254,6 @@ export default function AdminDestinations() {
             : destination
         )
       );
-
     } catch (err) {
       alert(
         extractErrorMessage(
@@ -283,7 +294,6 @@ export default function AdminDestinations() {
             : destination
         )
       );
-
     } catch (err) {
       alert(
         extractErrorMessage(
@@ -335,14 +345,26 @@ export default function AdminDestinations() {
 
   function getStatusClass(status) {
     if (status === "Approved") {
-      return "bg-green-500/10 text-green-300 border-green-500/30";
+      return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
     }
 
     if (status === "Rejected") {
-      return "bg-red-500/10 text-red-300 border-red-500/30";
+      return "bg-red-500/10 text-red-400 border-red-500/30";
     }
 
-    return "bg-yellow-500/10 text-yellow-300 border-yellow-500/30";
+    return "bg-amber-500/10 text-amber-400 border-amber-500/30";
+  }
+
+  function getStatusIcon(status) {
+    if (status === "Approved") {
+      return <CheckCircle2 size={14} />;
+    }
+
+    if (status === "Rejected") {
+      return <XCircle size={14} />;
+    }
+
+    return <Clock3 size={14} />;
   }
 
   return (
@@ -354,63 +376,97 @@ export default function AdminDestinations() {
           HEADER
       ===================================================== */}
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="section-title">
-            Destinations
-          </h1>
+      <div className="rounded-2xl border border-slate-700 bg-[#0f172a] p-6 shadow-lg">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#d4af37]/10 text-[#d4af37]">
+                <MapPinned size={25} />
+              </div>
 
-          <p className="mt-1 text-sm text-slate-400">
-            Manage destinations submitted by admin
-            and agencies.
-          </p>
+              <div>
+                <h1 className="text-2xl font-bold text-white">
+                  Destinations
+                </h1>
+
+                <p className="mt-1 text-sm text-slate-400">
+                  Manage destinations submitted by admin
+                  and agencies.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 rounded-xl bg-[#d4af37] px-5 py-3 text-sm font-bold text-[#0f172a] transition hover:bg-[#c9a227]"
+          >
+            <Plus size={18} />
+            Add Destination
+          </button>
         </div>
-
-        <button
-          onClick={openCreate}
-          className="btn-primary"
-        >
-          + Add Destination
-        </button>
       </div>
 
       {/* =====================================================
           FILTER BUTTONS
       ===================================================== */}
 
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           {
             label: "All",
             count: allCount,
+            icon: MapPinned,
           },
           {
             label: "Pending",
             count: pendingCount,
+            icon: Clock3,
           },
           {
             label: "Approved",
             count: approvedCount,
+            icon: CheckCircle2,
           },
           {
             label: "Rejected",
             count: rejectedCount,
+            icon: XCircle,
           },
-        ].map((filter) => (
-          <button
-            key={filter.label}
-            onClick={() =>
-              setActiveFilter(filter.label)
-            }
-            className={
-              activeFilter === filter.label
-                ? "rounded-lg bg-base-accent px-4 py-2 text-sm font-semibold text-black"
-                : "rounded-lg border border-base-border bg-base-card px-4 py-2 text-sm text-slate-300 hover:bg-base-surface"
-            }
-          >
-            {filter.label} ({filter.count})
-          </button>
-        ))}
+        ].map((filter) => {
+          const Icon = filter.icon;
+          const isActive =
+            activeFilter === filter.label;
+
+          return (
+            <button
+              key={filter.label}
+              onClick={() =>
+                setActiveFilter(filter.label)
+              }
+              className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold transition ${
+                isActive
+                  ? "border-[#d4af37]/40 bg-[#d4af37]/10 text-[#d4af37]"
+                  : "border-slate-700 bg-[#0f172a] text-slate-300 hover:border-[#d4af37]/30 hover:bg-[#1e293b]"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Icon size={17} />
+                {filter.label}
+              </span>
+
+              <span
+                className={
+                  isActive
+                    ? "rounded-full bg-[#d4af37] px-2 py-0.5 text-xs font-bold text-[#0f172a]"
+                    : "rounded-full bg-[#1e293b] px-2 py-0.5 text-xs text-slate-300"
+                }
+              >
+                {filter.count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* =====================================================
@@ -419,7 +475,9 @@ export default function AdminDestinations() {
 
       <div className="mt-8">
         {loading && (
-          <Loader label="Loading destinations..." />
+          <div className="rounded-2xl border border-slate-700 bg-[#0f172a] p-6">
+            <Loader label="Loading destinations..." />
+          </div>
         )}
 
         {!loading && error && (
@@ -432,8 +490,20 @@ export default function AdminDestinations() {
         {!loading &&
           !error &&
           filteredDestinations.length === 0 && (
-            <div className="card p-10 text-center text-slate-400">
-              No {activeFilter.toLowerCase()} destinations found.
+            <div className="rounded-2xl border border-slate-700 bg-[#0f172a] p-10 text-center shadow-lg">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#d4af37]/10 text-[#d4af37]">
+                <MapPinned size={27} />
+              </div>
+
+              <p className="mt-4 font-semibold text-white">
+                No {activeFilter.toLowerCase()} destinations
+                found.
+              </p>
+
+              <p className="mt-1 text-sm text-slate-400">
+                Try selecting another filter or add a new
+                destination.
+              </p>
             </div>
           )}
 
@@ -456,11 +526,11 @@ export default function AdminDestinations() {
                       key={
                         destination.destination_id
                       }
-                      className="card overflow-hidden"
+                      className="overflow-hidden rounded-2xl border border-slate-700 bg-[#0f172a] shadow-lg transition hover:-translate-y-1 hover:border-[#d4af37]/30"
                     >
                       {/* IMAGE */}
 
-                      <div className="h-40 w-full bg-base-surface">
+                      <div className="relative h-44 w-full bg-[#1e293b]">
                         {destination.image ? (
                           <img
                             src={getImageUrl(
@@ -472,39 +542,53 @@ export default function AdminDestinations() {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-slate-600">
-                            No image
+                          <div className="flex h-full flex-col items-center justify-center gap-2 text-slate-500">
+                            <ImagePlus size={30} />
+                            <span className="text-sm">
+                              No image
+                            </span>
                           </div>
                         )}
+
+                        <div className="absolute right-3 top-3">
+                          <span
+                            className={`flex items-center gap-1.5 rounded-full border bg-[#0f172a]/90 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm ${getStatusClass(
+                              destination.status
+                            )}`}
+                          >
+                            {getStatusIcon(
+                              destination.status
+                            )}
+                            {destination.status}
+                          </span>
+                        </div>
                       </div>
 
                       {/* CONTENT */}
 
-                      <div className="p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
+                      <div className="p-5">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#d4af37]/10 text-[#d4af37]">
+                            <MapPin size={19} />
+                          </div>
+
+                          <div className="min-w-0">
                             <p className="font-semibold text-white">
                               {destination.name}
                             </p>
 
-                            <p className="mt-1 text-sm text-slate-400">
+                            <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-400">
+                              <MapPin size={14} />
                               {destination.district}
                             </p>
                           </div>
-
-                          <span
-                            className={`rounded-full border px-2.5 py-1 text-xs font-medium ${getStatusClass(
-                              destination.status
-                            )}`}
-                          >
-                            {destination.status}
-                          </span>
                         </div>
 
                         {/* CREATED BY */}
 
-                        <div className="mt-4 rounded-lg bg-base-surface p-3">
-                          <p className="text-xs text-slate-500">
+                        <div className="mt-4 rounded-xl border border-slate-700 bg-[#1e293b] p-3">
+                          <p className="flex items-center gap-2 text-xs text-slate-500">
+                            <UserRound size={13} />
                             Created by
                           </p>
 
@@ -520,16 +604,23 @@ export default function AdminDestinations() {
                         {/* DESCRIPTION */}
 
                         {destination.description && (
-                          <p className="mt-3 line-clamp-2 text-sm text-slate-400">
-                            {
-                              destination.description
-                            }
-                          </p>
+                          <div className="mt-4 flex gap-2">
+                            <FileText
+                              size={16}
+                              className="mt-0.5 shrink-0 text-slate-500"
+                            />
+
+                            <p className="line-clamp-2 text-sm leading-5 text-slate-400">
+                              {
+                                destination.description
+                              }
+                            </p>
+                          </div>
                         )}
 
                         {/* ACTIONS */}
 
-                        <div className="mt-4 flex flex-wrap gap-2">
+                        <div className="mt-5 flex flex-wrap gap-2">
                           {/* PENDING ACTIONS */}
 
                           {isPending && (
@@ -543,8 +634,12 @@ export default function AdminDestinations() {
                                 disabled={
                                   isProcessing
                                 }
-                                className="flex-1 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#d4af37] px-3 py-2.5 text-sm font-bold text-[#0f172a] transition hover:bg-[#c9a227] disabled:cursor-not-allowed disabled:opacity-50"
                               >
+                                <CheckCircle2
+                                  size={16}
+                                />
+
                                 {isProcessing
                                   ? "Processing..."
                                   : "Approve"}
@@ -559,8 +654,9 @@ export default function AdminDestinations() {
                                 disabled={
                                   isProcessing
                                 }
-                                className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm font-semibold text-red-400 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                               >
+                                <XCircle size={16} />
                                 Reject
                               </button>
                             </>
@@ -574,8 +670,9 @@ export default function AdminDestinations() {
                                 destination
                               )
                             }
-                            className="btn-secondary flex-1 text-sm"
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-600 bg-[#1e293b] px-3 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-[#d4af37]/40 hover:text-[#d4af37]"
                           >
+                            <Pencil size={15} />
                             Edit
                           </button>
 
@@ -587,8 +684,9 @@ export default function AdminDestinations() {
                                 destination.destination_id
                               )
                             }
-                            className="btn-danger flex-1 text-sm"
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm font-semibold text-red-400 transition hover:bg-red-500/20"
                           >
+                            <Trash2 size={15} />
                             Delete
                           </button>
                         </div>
@@ -617,7 +715,7 @@ export default function AdminDestinations() {
         }
       >
         {formError && (
-          <p className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+          <p className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
             {formError}
           </p>
         )}
@@ -626,47 +724,69 @@ export default function AdminDestinations() {
           onSubmit={handleSubmit}
           className="space-y-4"
         >
-          <input
-            required
-            placeholder="Destination name"
-            className="input-field"
-            value={form.name}
-            onChange={(e) =>
-              setForm((current) => ({
-                ...current,
-                name: e.target.value,
-              }))
-            }
-          />
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-500">
+              Destination Name
+            </label>
 
-          <input
-            required
-            placeholder="District"
-            className="input-field"
-            value={form.district}
-            onChange={(e) =>
-              setForm((current) => ({
-                ...current,
-                district: e.target.value,
-              }))
-            }
-          />
-
-          <textarea
-            rows={3}
-            placeholder="Description"
-            className="input-field resize-none"
-            value={form.description}
-            onChange={(e) =>
-              setForm((current) => ({
-                ...current,
-                description: e.target.value,
-              }))
-            }
-          />
+            <input
+              required
+              placeholder="Destination name"
+              className="input-field"
+              value={form.name}
+              onChange={(e) =>
+                setForm((current) => ({
+                  ...current,
+                  name: e.target.value,
+                }))
+              }
+            />
+          </div>
 
           <div>
-            <label className="mb-2 block text-sm text-slate-300">
+            <label className="mb-2 block text-sm font-medium text-slate-500">
+              District
+            </label>
+
+            <input
+              required
+              placeholder="District"
+              className="input-field"
+              value={form.district}
+              onChange={(e) =>
+                setForm((current) => ({
+                  ...current,
+                  district: e.target.value,
+                }))
+              }
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-500">
+              Description
+            </label>
+
+            <textarea
+              rows={3}
+              placeholder="Description"
+              className="input-field resize-none"
+              value={form.description}
+              onChange={(e) =>
+                setForm((current) => ({
+                  ...current,
+                  description: e.target.value,
+                }))
+              }
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-500">
+              <ImagePlus
+                size={16}
+                className="text-[#d4af37]"
+              />
               Destination Image
             </label>
 
@@ -678,9 +798,9 @@ export default function AdminDestinations() {
             />
 
             {form.image && (
-              <p className="mt-2 text-sm text-slate-400">
-                Selected:{" "}
-                {form.image.name}
+              <p className="mt-2 flex items-center gap-2 text-sm text-slate-400">
+                <Upload size={14} />
+                Selected: {form.image.name}
               </p>
             )}
 
@@ -695,8 +815,10 @@ export default function AdminDestinations() {
           <button
             type="submit"
             disabled={saving}
-            className="btn-primary w-full"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#d4af37] px-4 py-3 text-sm font-bold text-[#0f172a] transition hover:bg-[#c9a227] disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <CheckCircle2 size={17} />
+
             {saving
               ? "Uploading..."
               : editingId
@@ -708,4 +830,3 @@ export default function AdminDestinations() {
     </DashboardLayout>
   );
 }
-

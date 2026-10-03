@@ -57,10 +57,6 @@ def create_review():
             "message": "Rating must be between 1 and 5"
         }, 400
 
-    # -------------------------
-    # Logged-in tourist
-    # -------------------------
-
     tourist_id = int(get_jwt_identity())
 
     # -------------------------
@@ -76,8 +72,7 @@ def create_review():
         }, 404
 
     # -------------------------
-    # Make sure booking belongs
-    # to logged-in tourist
+    # Booking belongs to tourist
     # -------------------------
 
     if booking.tourist_id != tourist_id:
@@ -122,7 +117,6 @@ def create_review():
             "message": "Package not found"
         }, 404
 
-    # Agency comes from package
     agency_id = package.agency_id
 
     # -------------------------
@@ -132,11 +126,14 @@ def create_review():
     new_review = Review(
         tourist_id=tourist_id,
         agency_id=agency_id,
+        package_id=package.package_id,
         booking_id=booking.booking_id,
         rating=rating,
-        review=review_text.strip()
-        if isinstance(review_text, str)
-        else None
+        review=(
+            review_text.strip()
+            if isinstance(review_text, str)
+            else None
+        )
     )
 
     db.session.add(new_review)
@@ -149,6 +146,7 @@ def create_review():
             "review_id": new_review.review_id,
             "tourist_id": new_review.tourist_id,
             "agency_id": new_review.agency_id,
+            "package_id": new_review.package_id,
             "booking_id": new_review.booking_id,
             "rating": new_review.rating,
             "review": new_review.review,
@@ -218,6 +216,79 @@ def get_agency_reviews(agency_id):
                     if review.agency
                     else None
                 ),
+                "package_id": review.package_id,
+                "booking_id": review.booking_id,
+                "rating": review.rating,
+                "review": review.review,
+                "created_at": (
+                    review.created_at.isoformat()
+                    if review.created_at
+                    else None
+                )
+            }
+            for review in reviews
+        ]
+    }, 200
+
+
+# =========================================================
+# GET PACKAGE REVIEWS
+# Public
+# =========================================================
+
+@review_bp.route(
+    "/api/package/<int:package_id>/reviews",
+    methods=["GET"]
+)
+def get_package_reviews(package_id):
+
+    package = Package.query.get(package_id)
+
+    if not package:
+        return {
+            "success": False,
+            "message": "Package not found"
+        }, 404
+
+    reviews = Review.query.filter_by(
+        package_id=package_id
+    ).order_by(
+        Review.created_at.desc()
+    ).all()
+
+    total_reviews = len(reviews)
+
+    average_rating = (
+        sum(review.rating for review in reviews)
+        / total_reviews
+        if total_reviews > 0
+        else 0
+    )
+
+    return {
+        "success": True,
+        "package": {
+            "package_id": package.package_id,
+            "package_name": package.package_name
+        },
+        "average_rating": round(average_rating, 1),
+        "total_reviews": total_reviews,
+        "reviews": [
+            {
+                "review_id": review.review_id,
+                "tourist_id": review.tourist_id,
+                "tourist_name": (
+                    review.tourist.full_name
+                    if review.tourist
+                    else None
+                ),
+                "agency_id": review.agency_id,
+                "agency_name": (
+                    review.agency.agency_name
+                    if review.agency
+                    else None
+                ),
+                "package_id": review.package_id,
                 "booking_id": review.booking_id,
                 "rating": review.rating,
                 "review": review.review,

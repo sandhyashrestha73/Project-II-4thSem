@@ -94,11 +94,17 @@ export default function Blog() {
                   <div className="p-4">
                     <p className="font-semibold text-text-main line-clamp-2">
                       {b.title}
-                    </p>
-
+                    
                     <p className="mt-2 line-clamp-2 text-sm text-text-muted">
                       {b.content}
                     </p>
+
+                    </p>
+                    {b.agency_name && (
+                      <p className="mt-1 text-sm text-accent-secondary">
+                        By {b.agency_name}
+                    </p>
+                      )}
                   </div>
                 </Link>
               ))}

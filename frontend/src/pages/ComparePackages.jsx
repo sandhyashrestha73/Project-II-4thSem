@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getImageUrl } from "../utils/imageUrl";
+import AiComparisonSummary from "../components/AiComparisonSummary";
 
 export default function ComparePackages() {
   const location = useLocation();
@@ -235,7 +236,13 @@ export default function ComparePackages() {
             </tbody>
           </table>
         </div>
-
+        
+        {selectedPackages.length === 2 && (
+          <AiComparisonSummary
+            packageA={selectedPackages[0]}
+            packageB={selectedPackages[1]}
+          />
+        )}
         <div className="mt-8">
           <Link
             to="/packages"
