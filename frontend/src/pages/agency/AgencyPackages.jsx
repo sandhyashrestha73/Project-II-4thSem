@@ -4,7 +4,6 @@ import {
   Plus,
   MapPin,
   Clock3,
-  IndianRupee,
   ImagePlus,
   Pencil,
   Trash2,
@@ -386,14 +385,14 @@ export default function AgencyPackages() {
                         <span>{p.duration}</span>
                       </div>
 
+                      {/* NPR PRICE */}
+
                       <div className="flex items-center gap-2 text-sm text-slate-400">
-                        <IndianRupee
-                          size={16}
-                          className="text-[#d4af37]"
-                        />
+                        <span className="font-semibold text-[#d4af37]">
+                          NPR
+                        </span>
 
                         <span className="font-semibold text-[#d4af37]">
-                          NPR{" "}
                           {Number(
                             p.price
                           ).toLocaleString()}
@@ -572,10 +571,9 @@ export default function AgencyPackages() {
 
             <div>
               <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-slate-500">
-                <IndianRupee
-                  size={15}
-                  className="text-[#d4af37]"
-                />
+                <span className="font-semibold text-[#d4af37]">
+                  NPR
+                </span>
                 Price
               </label>
 
